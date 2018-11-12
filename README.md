@@ -1,7 +1,7 @@
 # Trabalho de Otimização Combinatória 2018/2
 ## Metaheurística: GRASP
 ## Problema: Coloração Mais Balanceada
-- Instância: Dado um grafo representado por uma lista de vértices e arestas, uma
+- Instância: Um grafo representado por uma lista de vértices e arestas, uma
 lista de pesos correspondentes a cada vértice e um inteiro positivo k.
 - Solução: Uma k-coloração do grafo.
 - Objetivo: Minimizar o peso máximo da cor com a maior soma dos pesos das arestas.
