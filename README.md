@@ -7,8 +7,9 @@ lista de pesos correspondentes a cada vértice e um inteiro positivo k.
 - Objetivo: Minimizar o peso máximo da cor com a maior soma dos pesos das arestas.
 - Informações ddicionais: [Instâncias para baixar.](http://www.inf.ufrgs.br/~mrpritt/oc/cmb.zip)
 - Melhores valores conhecidos:
+
 | Instância	 |       BKV |
-|----------------|-----------|
+| -------------- | --------- |
 | cmb01          |    101405 |
 | cmb02          | 250083.96 |
 | cmb03          | 140129.42 |
