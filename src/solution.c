@@ -1,25 +1,41 @@
-#include "solution.h"
+#include "../include/solution.h"
 
 int newSolution(Solution* solution, Instance* instance)
 {
-    solution = malloc(sizeof(Solution));
-    if (solution == 0) { return ERR_MALLOC; }
-    
     solution->coloration = malloc(sizeof(unsigned int*) * instance->numColors);
     if (solution->coloration == 0) { return ERR_MALLOC; }
     
-    unsigned int colorIndex;
+    return OUT_SUCCESS;
+}
+
+void destroySolution(Solution* solution)
+{
+    free(solution->coloration);
+    free(solution);
+}
+
+int checkFactibility(Instance* instance, Solution* solution)
+{
     unsigned int i;
-    for (colorIndex = 0; colorIndex < instance->numVertices; colorIndex++)
+    unsigned int j;
+    for (i = 0; i < instance->numVertices; i++)
     {
-	solution->coloration[colorIndex] = malloc(sizeof(unsigned int) * instance->numVertices);
-	if (solution->coloration[colorIndex] == 0) { return ERR_MALLOC; }
-	
-	for (i = 0; i < instance->numVertices; i++)
+	for (j = 0; j < instance->numVertices; j++)
 	{
-	    solution->coloration[colorIndex][i] = 0;
-	}	
+	    int areSameColors = solution->coloration[i] == solution->coloration[j];
+	    int edge = existsEdge(instance, i, j);
+	    
+	    if (areSameColors && i != j && edge)
+	    {
+		return 0;
+	    }
+	}
     }
 
-    return OUT_SUCCESS;
+    return 1;
+}
+   
+void colorVertex(Solution* solution, unsigned int vertex, unsigned int color)
+{
+    solution->coloration[vertex] = color;
 }

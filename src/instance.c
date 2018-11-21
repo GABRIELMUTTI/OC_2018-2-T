@@ -1,14 +1,16 @@
-#include "instance.h"
+#include "../include/instance.h"
 
-int newInstance(Instance* instance, unsigned int numColors, unsigned int numVertices, unsigned int* weights)
+int newInstance(Instance* instance, unsigned int numColors, unsigned int numVertices)
 {
-    instance = malloc(sizeof(Instance));
-    if (instance == 0) { return ERR_MALLOC; }
-
     instance->numColors = numColors;
     instance->numVertices = numVertices;
-    instance->weights = weights;
 
+    instance->weights = malloc(sizeof(float) * numVertices);
+    if (instance->weights == 0) { return ERR_MALLOC; }
+
+    instance->graph = malloc(sizeof(unsigned int*) * numVertices);
+    if (instance->graph == 0) { return ERR_MALLOC; }
+    
     unsigned int i;
     unsigned int j;
     for (i = 0; i < numVertices; i++)
@@ -28,6 +30,11 @@ int newInstance(Instance* instance, unsigned int numColors, unsigned int numVert
 void addEdge(Instance* instance, unsigned int v, unsigned int u)
 {
     instance->graph[v][u] = 1;
+}
+
+void setWeight(Instance* instance, unsigned int vertex, float weight)
+{
+    instance->weights[vertex] = weight;
 }
 
 void destroyInstance(Instance* instance)
