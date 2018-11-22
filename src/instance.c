@@ -29,7 +29,7 @@ int newInstance(Instance* instance, unsigned int numColors, unsigned int numVert
 
 void addEdge(Instance* instance, unsigned int v, unsigned int u)
 {
-    instance->graph[v][u] = 1;
+    instance->graph[v][u] = 1;    
 }
 
 void setWeight(Instance* instance, unsigned int vertex, float weight)
