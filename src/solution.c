@@ -1,9 +1,12 @@
 #include "../include/solution.h"
 
-int newSolution(Solution* solution, Instance* instance)
+int newSolution(Solution** solution, Instance* instance)
 {
-    solution->coloration = malloc(sizeof(unsigned int*) * instance->numColors);
-    if (solution->coloration == 0) { return ERR_MALLOC; }
+    *solution = malloc(sizeof(Solution));
+    if (*solution == NULL) { return ERR_MALLOC; }
+
+    (*solution)->coloration = malloc(sizeof(unsigned int*) * instance->numColors);
+    if ((*solution)->coloration == 0) { return ERR_MALLOC; }
     
     return OUT_SUCCESS;
 }

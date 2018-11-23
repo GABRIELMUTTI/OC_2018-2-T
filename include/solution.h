@@ -23,7 +23,7 @@ typedef struct solutionValue_s
 } SolutionValue;
 
 // Construtor:
-int newSolution(Solution* solution, Instance* instance);
+int newSolution(Solution** solution, Instance* instance);
 
 // Destructor:
 void destroySolution(Solution* solution);
