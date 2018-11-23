@@ -18,9 +18,10 @@ typedef struct neighbour_s
 
 
 int grasp(Instance* instance, Solution** solution, SolutionValue* value, unsigned int numIterations);
-int greedySolutionFinder(Instance* instance, Solution** solution, SolutionValue* solutionValue);
+int greedySolutionFinder(Instance* instance, Solution** solution, SolutionValue* solutionValue, float* sortedWeights);
 int bestImprovementLocalSearch(Instance* instance, Solution** currentSolution, SolutionValue* solutionValue);
 int findNeighbours(Instance* instance, Solution* solution, Neighbour** neighbours, unsigned int* numNeighbours);
+unsigned int greedyChooseVertex(Instance* instance, float* sortedWeights, unsigned int* chosenVertexes , unsigned int* vertex, unsigned int* color, SolutionValue* value);
 
 
 #endif // __GRASP_H__

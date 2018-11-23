@@ -4,17 +4,18 @@ int grasp(Instance* instance, Solution** solution, SolutionValue* value, unsigne
 {
     if (*solution == NULL)
     {
-	*solution = malloc(sizeof(Solution));
-	if (*solution == NULL) { return -3; }
+	if (newSolution(solution, instance) != 0) { return -1; }
     }
     
     Solution* currentSolution, *bestSolution;
     SolutionValue bestSolutionValue, currentSolutionValue;
+
+    float* sortedWeights = NULL;
     
     unsigned int iterationCounter = 0;
     do
     {
-	if (greedySolutionFinder(instance, &currentSolution, &currentSolutionValue) != 0) { return -1; }
+	if (greedySolutionFinder(instance, &currentSolution, &currentSolutionValue, sortedWeights) != 0) { return -1; }
 	if (bestImprovementLocalSearch(instance, &currentSolution, &currentSolutionValue)) { return -2; }
 
 	if (currentSolutionValue.bestValue < bestSolutionValue.bestValue)
@@ -32,10 +33,41 @@ int grasp(Instance* instance, Solution** solution, SolutionValue* value, unsigne
     return 0;
 }
 
-int greedySolutionFinder(Instance* instance, Solution** solution, SolutionValue* solutionValue)
+int greedySolutionFinder(Instance* instance, Solution** solution, SolutionValue* solutionValue, float* sortedWeights)
+{
+    if (*solution == 0)
+    {
+	if (newSolution(solution, instance) != 0) { return -1; }
+    }
+
+    unsigned int chosenVertexes[instance->numVertices];
+
+    unsigned int i;
+    for (i = 0; i < instance->numVertices; i++)
+    {
+	chosenVertexes[i] = 0;
+    }
+    
+    unsigned int vertexCounter;
+    while (vertexCounter < instance->numVertices)
+    {
+	unsigned int color;
+	unsigned int vertex;
+	greedyChooseVertex(instance, sortedWeights, chosenVertexes, &vertex, &color, solutionValue);
+	
+	chosenVertexes[vertex] = 1;
+	colorVertex(*solution, vertex, color);
+	
+	vertexCounter++;
+    }
+    
+    return 0;
+}
+
+unsigned int greedyChooseVertex(Instance* instance, float* sortedWeights, unsigned int* chosenVertices, unsigned int* vertex, unsigned int* color, SolutionValue* value)
 {
 
-    return 0;
+    
 }
 
 int bestImprovementLocalSearch(Instance* instance, Solution** solution, SolutionValue* solutionValue)
