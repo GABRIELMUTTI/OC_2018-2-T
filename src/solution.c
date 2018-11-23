@@ -39,3 +39,32 @@ void colorVertex(Solution* solution, unsigned int vertex, unsigned int color)
 {
     solution->coloration[vertex] = color;
 }
+
+float getValue(Instance* instance, Solution* solution)
+{
+    float colorValues[instance->numVertices];
+
+    unsigned int i;
+    for (i = 0; i < instance->numColors; i++)
+    {
+	colorValues[i] = 0.0f;
+    }
+
+    for(i = 0; i < instance->numVertices; i++)
+    {
+	unsigned int color = solution->coloration[i];
+	colorValues[color] += instance->weights[i];
+    }
+
+
+    float heaviestColorValue = colorValues[0];
+    for (i = 1; i < instance->numColors; i++)
+    {
+	if (colorValues[i] < heaviestColorValue)
+	{
+	    heaviestColorValue = colorValues[i];
+	}
+    }
+
+    return heaviestColorValue;
+}

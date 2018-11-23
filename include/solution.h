@@ -24,6 +24,7 @@ void destroySolution(Solution* solution);
 // Functions:
 int checkFactibility(Instance* instance, Solution* solution);
 void colorVertex(Solution* solution, unsigned int vertex, unsigned int color);
+float getValue(Instance* instance, Solution* solution);
 
 #endif // __SOLUTION_H__
 

@@ -17,7 +17,7 @@ int grasp(Instance* instance, Solution** solution, float* value, unsigned int nu
 	if (greedySolutionFinder(instance, &currentSolution) != 0) { return -1; }
 	if (bestImprovementLocalSearch(instance, &currentSolution, &solutionValue)) { return -2; }
 
-	if (solutionValue > bestSolutionValue)
+	if (solutionValue < bestSolutionValue)
 	{
 	    bestSolution = currentSolution;
 	    bestSolutionValue = solutionValue;
@@ -38,7 +38,40 @@ int greedySolutionFinder(Instance* instance, Solution** solution)
     return 0;
 }
 
-int bestImprovementLocalSearch(Instance* instance, Solution** currentSolution, float* solutionValue)
+int bestImprovementLocalSearch(Instance* instance, Solution** solution, float* solutionValue)
+{
+    unsigned int numNeighbours;
+    float bestValue, neighbourValue;
+    Solution** neighbours;
+    Solution* bestSolution;
+    
+    int haveImproved = 1;
+    unsigned int i;
+    do
+    {
+	if (findNeighbours(instance, bestSolution, &neighbours, &numNeighbours) != 0) { return -1; }
+
+	for (i = 0; i < numNeighbours; i++)
+	{
+	    neighbourValue = getValue(instance, neighbours[i]);
+	    if (neighbourValue < bestValue)
+	    {
+		// The better way to do this is to manipulate the solution instead of copy it.
+		// For now we’ll do this.
+		bestSolution = neighbours[i];
+		bestValue = neighbourValue;
+	    }
+	}
+		
+    } while(haveImproved);
+
+    *solutionValue = bestValue;
+    *solution = bestSolution;
+    
+    return 0;
+}
+
+int findNeighbours(Instance* instance, Solution* solution, Solution*** neighbours, unsigned int* numNeighbours)
 {
 
     return 0;
