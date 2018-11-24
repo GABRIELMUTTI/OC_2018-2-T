@@ -5,7 +5,7 @@ int loadInstance(Instance** instancePtr, const char* filepath)
     FILE* file = fopen(filepath, "r");
     const char* delimiter = " \n";
     
-    char* line;
+    char* line = NULL;
 
     if (file == 0) { return -1; }
     if (getLine(file, &line, delimiter) != 0) { return ERR_GETLINE; }
