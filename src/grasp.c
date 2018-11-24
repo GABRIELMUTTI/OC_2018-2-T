@@ -1,6 +1,6 @@
 #include "../include/grasp.h"
 
-int grasp(Instance* instance, Solution** solution, SolutionValue* value, unsigned int numIterations)
+int grasp(Instance* instance, Solution** solution, SolutionValue* value, unsigned int numIterations, float alpha)
 {
     if (*solution == NULL)
     {
@@ -10,13 +10,14 @@ int grasp(Instance* instance, Solution** solution, SolutionValue* value, unsigne
     Solution* currentSolution, *bestSolution;
     SolutionValue bestSolutionValue, currentSolutionValue;
 
-    float* sortedWeights = NULL;
+    VertexWeight* sortedWeights;
+    if (sortWeights(instance, &sortedWeights) != 0) { return -1; }
     
     unsigned int iterationCounter = 0;
     do
     {
-	if (greedySolutionFinder(instance, &currentSolution, &currentSolutionValue, sortedWeights) != 0) { return -1; }
-	if (bestImprovementLocalSearch(instance, &currentSolution, &currentSolutionValue)) { return -2; }
+	if (greedySolutionFinder(instance, &currentSolution, &currentSolutionValue, sortedWeights, alpha) != 0) { return -1; }
+	if (bestImprovementLocalSearch(instance, currentSolution, &currentSolutionValue)) { return -2; }
 
 	if (currentSolutionValue.bestValue < bestSolutionValue.bestValue)
 	{
@@ -33,7 +34,7 @@ int grasp(Instance* instance, Solution** solution, SolutionValue* value, unsigne
     return 0;
 }
 
-int greedySolutionFinder(Instance* instance, Solution** solution, SolutionValue* solutionValue, float* sortedWeights)
+int greedySolutionFinder(Instance* instance, Solution** solution, SolutionValue* solutionValue, VertexWeight* sortedWeights, float alpha)
 {
     if (*solution == 0)
     {
@@ -53,10 +54,17 @@ int greedySolutionFinder(Instance* instance, Solution** solution, SolutionValue*
     {
 	unsigned int color;
 	unsigned int vertex;
-	greedyChooseVertex(instance, sortedWeights, chosenVertexes, &vertex, &color, solutionValue);
+	greedyChooseVertex(instance, sortedWeights, chosenVertexes, vertexCounter, &vertex, &color, solutionValue, alpha);
 	
 	chosenVertexes[vertex] = 1;
 	colorVertex(*solution, vertex, color);
+
+	solutionValue->colorValues[color] += instance->weights[vertex];
+
+	if (solutionValue->colorValues[color] < solutionValue->bestValue)
+	{
+	    solutionValue->bestValue = solutionValue->colorValues[color];
+	}
 	
 	vertexCounter++;
     }
@@ -64,39 +72,76 @@ int greedySolutionFinder(Instance* instance, Solution** solution, SolutionValue*
     return 0;
 }
 
-unsigned int greedyChooseVertex(Instance* instance, float* sortedWeights, unsigned int* chosenVertices, unsigned int* vertex, unsigned int* color, SolutionValue* value)
+int greedyChooseVertex(Instance* instance, VertexWeight* sortedWeights, unsigned int* chosenVertices, unsigned int numChosenVertices, unsigned int* vertex, unsigned int* color, SolutionValue* value, float alpha)
 {
+    unsigned int sizeRCL = alpha * (instance->numVertices - numChosenVertices);
+    if (sizeRCL == 0)
+    {
+	sizeRCL = 1;
+    }
 
+    unsigned int rcl[sizeRCL];
+    unsigned int rclCounter = 0;
+
+    // Finds the heaviest vertex.
+    while (rclCounter < sizeRCL)
+    {
+	unsigned int i;
+	for (i = 0; i < instance->numVertices; i++)
+	{
+	    if (chosenVertices[i] != 1)
+	    {
+		rcl[rclCounter] = sortedWeights[i].vertex; 
+	    }
+	}
+	
+	rclCounter++;
+    }
+
+    // Finds the lightest color.
+
+    unsigned int lightestColor = 0;
+    unsigned int i;
+    for (i = 1; i < instance->numColors; i++)
+    {
+	if (value->colorValues[i] < value->colorValues[lightestColor])
+	{
+	    lightestColor = i;
+	}
+    }
     
+    
+    unsigned int randomIndex = rand() % sizeRCL;
+
+    *vertex = rcl[randomIndex];
+    *color = lightestColor;
+        
+    return 0;
 }
 
-int bestImprovementLocalSearch(Instance* instance, Solution** solution, SolutionValue* solutionValue)
+int bestImprovementLocalSearch(Instance* instance, Solution* solution, SolutionValue* solutionValue)
 {
     unsigned int numNeighbours;
     SolutionValue bestValue, neighbourValue;
     Neighbour* neighbours;
-    Solution* bestSolution, *neighbour;
-    // Need to implement deep copy.
+    Solution* bestSolution;
 
     bestValue = *solutionValue;
-    *bestSolution = **solution;
+    bestSolution = solution;
     
     int haveImproved = 1;
     unsigned int i;
     do
     {
 	if (findNeighbours(instance, bestSolution, &neighbours, &numNeighbours) != 0) { return -1; }
-
-	*neighbour = *bestSolution;
+	
 	neighbourValue = bestValue;
 	for (i = 0; i < numNeighbours; i++)
 	{
 	    unsigned int changedVertex = neighbours[i].vertex;
 	    unsigned int inColor = neighbours[i].inColor;
 	    unsigned int outColor = neighbours[i].outColor;
-	
-	   
-      	    neighbour->coloration[changedVertex] = inColor;
+		   
 	    neighbourValue.colorValues[outColor] -= instance->weights[changedVertex];
 	    neighbourValue.colorValues[inColor] += instance->weights[changedVertex];
 
@@ -104,7 +149,6 @@ int bestImprovementLocalSearch(Instance* instance, Solution** solution, Solution
 	    {
 		neighbourValue.bestValue = neighbourValue.colorValues[inColor];
 	    }
-	    
 	    
 	    if (neighbourValue.bestValue < bestValue.bestValue)
 	    {
@@ -116,7 +160,6 @@ int bestImprovementLocalSearch(Instance* instance, Solution** solution, Solution
     } while(haveImproved);
 
     *solutionValue = bestValue;
-    *solution = bestSolution;
     
     return 0;
 }
@@ -160,5 +203,36 @@ int findNeighbours(Instance* instance, Solution* solution, Neighbour** neighbour
     *neighbours = local_neighbours;
     *numNeighbours = local_numNeighbours;
     
+    return 0;
+}
+
+int sortWeights(Instance* instance, VertexWeight** sortedWeights)
+{
+    if (*sortedWeights == NULL)
+    {
+	*sortedWeights = malloc(sizeof(VertexWeight) * instance->numVertices);
+	if (*sortedWeights == NULL) { return -1; }
+    }
+
+    // Insertion sort (for now, eventually I’ll implement quicksort probably).
+    unsigned int i, j;
+    unsigned int heaviestVertex;
+    float weight;
+    for (i = 0; i < instance->numVertices; i++)
+    {
+	weight = 0;
+	for (j = i + 1; j < instance->numVertices; j++)
+	{
+	    if (instance->weights[j] > weight)
+	    {
+		heaviestVertex = j;
+		weight = instance->weights[j];
+	    }
+	}
+
+	(*sortedWeights)[i].vertex = heaviestVertex;
+	(*sortedWeights)[i].weight = weight;
+    }
+
     return 0;
 }
