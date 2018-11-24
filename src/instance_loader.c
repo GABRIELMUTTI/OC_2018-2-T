@@ -20,8 +20,8 @@ int loadInstance(Instance* instance, const char* filepath)
     unsigned int numColors = atoi(strNumColors);
     free(line);
 
-    if (newInstance(instance, numColors, numVertices) != 0) { return ERR_NEW_INSTANCE; }
-    
+    if (newInstance(&instance, numColors, numVertices) != 0) { return ERR_NEW_INSTANCE; }
+   
     if (getLine(file, &line, delimiter) != 0) { return ERR_GETLINE; }
     
     instance->weights[0] = strtof(strtok(line, delimiter), NULL);
