@@ -10,8 +10,9 @@
 #define TST_ERR_SORT_WEIGHTS -2
 #define TST_ERR_NOT_SORTED -3
 #define TST_ERR_WRONG_VERTEX_WEIGHT -4
+#define TST_ERR_MISSING_WEIGHTS -5
 
-int testSortWeights();
+int testSortWeights(const char* filepath);
 
 
 
