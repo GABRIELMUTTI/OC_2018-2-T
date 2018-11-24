@@ -16,7 +16,7 @@ typedef struct solution_s
 } Solution;
 
 // Construtor:
-int newSolution(Solution* solution, Instance* instance);
+int newSolution(Solution** solution, Instance* instance);
 
 // Destructor:
 void destroySolution(Solution* solution);

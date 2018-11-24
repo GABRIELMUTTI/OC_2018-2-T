@@ -1,7 +1,15 @@
 #include "../include/instance.h"
 
-int newInstance(Instance* instance, unsigned int numColors, unsigned int numVertices)
+int newInstance(Instance** instancePtr, unsigned int numColors, unsigned int numVertices)
 {
+    if (*instancePtr == NULL)
+    {
+	*instancePtr = malloc(sizeof(Instance));
+	if (*instancePtr == NULL) { return ERR_MALLOC; }
+    }
+
+    Instance* instance = *instancePtr;
+        
     instance->numColors = numColors;
     instance->numVertices = numVertices;
 

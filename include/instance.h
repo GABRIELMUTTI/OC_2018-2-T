@@ -18,7 +18,7 @@ typedef struct instance_s
 
 
 // Constructor:
-int newInstance(Instance* instance, unsigned int numColors, unsigned int numVertices);
+int newInstance(Instance** instance, unsigned int numColors, unsigned int numVertices);
 
 // Destructor:
 void destroyInstance(Instance* instance);
