@@ -11,7 +11,7 @@
 #include <string.h>
 #include <stddef.h>
 
-int loadInstance(Instance* instance, const char* filepath);
+int loadInstance(Instance** instancePtr, const char* filepath);
 int getLine(FILE* file, char** line, const char* delimiters);
 
 
