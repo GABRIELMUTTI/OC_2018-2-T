@@ -13,7 +13,7 @@
 #define TST_ERR_MISSING_WEIGHTS -5
 
 int testSortWeights(const char* filepath);
-
+int test_main();
 
 
 #endif // __TEST_SORT_WEIGHTS_H__

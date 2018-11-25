@@ -51,7 +51,7 @@ int testSortWeights(const char* filepath)
     return 0;
 }
 
-int main()
+int test_main()
 {
     int status;
     
