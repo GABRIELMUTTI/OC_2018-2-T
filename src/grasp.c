@@ -82,16 +82,19 @@ int greedyChooseVertex(Instance* instance, VertexWeight* sortedWeights, unsigned
 
     unsigned int rcl[sizeRCL];
     unsigned int rclCounter = 0;
-
+    unsigned int nextVertexIndex = 0;
+       
     // Finds the heaviest vertex.
     while (rclCounter < sizeRCL)
     {
 	unsigned int i;
-	for (i = 0; i < instance->numVertices; i++)
+	for (i = nextVertexIndex; i < instance->numVertices; i++)
 	{
 	    if (chosenVertices[i] != 1)
 	    {
-		rcl[rclCounter] = sortedWeights[i].vertex; 
+		nextVertexIndex = i + 1;
+		rcl[rclCounter] = sortedWeights[i].vertex;
+		break;
 	    }
 	}
 	
