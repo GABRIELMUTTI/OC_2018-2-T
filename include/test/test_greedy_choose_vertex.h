@@ -15,6 +15,6 @@
 
 
 int testGreedyChooseVertex(const char* filepath);
-int test_main();
+int testMain();
 
 #endif // __TEST_GREEDY_CHOOSE_VERTEX_H__
