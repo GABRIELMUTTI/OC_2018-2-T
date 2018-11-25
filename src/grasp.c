@@ -213,26 +213,36 @@ int sortWeights(Instance* instance, VertexWeight** sortedWeights)
 	*sortedWeights = malloc(sizeof(VertexWeight) * instance->numVertices);
 	if (*sortedWeights == NULL) { return -1; }
     }
-
-    // Insertion sort (for now, eventually I’ll implement quicksort probably).
-    unsigned int i, j;
-    unsigned int heaviestVertex;
-    float weight;
+    
+    VertexWeight* sortingArray = *sortedWeights; 
+        
+    unsigned int i;
     for (i = 0; i < instance->numVertices; i++)
     {
-	weight = 0;
+	sortingArray[i].vertex = i;
+	sortingArray[i].weight = instance->weights[i];
+    }
+    
+    // Insertion sort (for now, eventually I’ll implement quicksort probably).
+    unsigned int j;
+    unsigned int heaviestIndex;
+    VertexWeight heaviestVertexWeight;
+    for (i = 0; i < instance->numVertices; i++)
+    {
+	heaviestVertexWeight = sortingArray[i];
+	heaviestIndex = i;
 	for (j = i + 1; j < instance->numVertices; j++)
 	{
-	    if (instance->weights[j] > weight)
+	    if (sortingArray[j].weight > heaviestVertexWeight.weight)
 	    {
-		heaviestVertex = j;
-		weight = instance->weights[j];
+		heaviestVertexWeight = sortingArray[j];
+		heaviestIndex = j;
 	    }
 	}
 
-	(*sortedWeights)[i].vertex = heaviestVertex;
-	(*sortedWeights)[i].weight = weight;
+	sortingArray[heaviestIndex] = sortingArray[i];
+	sortingArray[i] = heaviestVertexWeight;
     }
-
+    
     return 0;
 }
