@@ -46,7 +46,7 @@ int testGreedyChooseVertex(const char* filepath)
     return 0;
 }
 
-int main()
+int testMain()
 {
     srand(time(NULL));
     testGreedyChooseVertex("/home/gabriel/Documents/ufrgs/courses/oc/trab/instances/cmb10");
