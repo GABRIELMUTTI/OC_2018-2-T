@@ -62,11 +62,3 @@ int testGreedySolutionFinder(const char* filepath)
 
     return 0;
 }
-
-int testMain()
-{
-    int status;
-    status = testGreedySolutionFinder("/home/gabriel/Documents/ufrgs/courses/oc/trab/instances/tst_cmb01");
-
-    return status;
-}
