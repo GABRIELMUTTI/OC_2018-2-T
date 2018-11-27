@@ -19,6 +19,6 @@
 
 
 int testGreedySolutionFinder(const char* filepath);
-int main();
+int testMain();
 
 #endif // __TEST_GREEDY_SOLUTION_FINDER_H_

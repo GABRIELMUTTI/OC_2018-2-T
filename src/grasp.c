@@ -48,8 +48,8 @@ int greedySolutionFinder(Instance* instance, Solution** solution, SolutionValue*
     {
 	chosenVertexes[i] = 0;
     }
-    
-    unsigned int vertexCounter;
+
+    unsigned int vertexCounter = 0;
     while (vertexCounter < instance->numVertices)
     {
 	unsigned int color;
@@ -61,12 +61,16 @@ int greedySolutionFinder(Instance* instance, Solution** solution, SolutionValue*
 
 	solutionValue->colorValues[color] += instance->weights[vertex];
 
-	if (solutionValue->colorValues[color] < solutionValue->bestValue)
-	{
-	    solutionValue->bestValue = solutionValue->colorValues[color];
-	}
-	
 	vertexCounter++;
+    }
+
+    solutionValue->bestValue = solutionValue->colorValues[0];
+    for (i = 1; i < instance->numColors; i++)
+    {
+	if (solutionValue->colorValues[i] < solutionValue->bestValue)
+	{
+	    solutionValue->bestValue = solutionValue->colorValues[i];
+	}
     }
     
     return 0;
