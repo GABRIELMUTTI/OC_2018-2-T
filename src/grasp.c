@@ -41,12 +41,18 @@ int greedySolutionFinder(Instance* instance, Solution** solution, SolutionValue*
 	if (newSolution(solution, instance) != 0) { return -1; }
     }
 
-    unsigned int chosenVertexes[instance->numVertices];
-
+    // Initializes numVertexPerColor.
     unsigned int i;
+    for (i = 0; i < instance->numColors; i++)
+    {
+	(*solution)->numVertexPerColor[i] = 0;
+    }
+   
+    // Initializer chosenVertices.
+    unsigned int chosenVertices[instance->numVertices];
     for (i = 0; i < instance->numVertices; i++)
     {
-	chosenVertexes[i] = 0;
+	chosenVertices[i] = 0;
     }
 
     unsigned int vertexCounter = 0;
@@ -54,12 +60,13 @@ int greedySolutionFinder(Instance* instance, Solution** solution, SolutionValue*
     {
 	unsigned int color;
 	unsigned int vertex;
-	greedyChooseVertex(instance, sortedWeights, chosenVertexes, vertexCounter, &vertex, &color, solutionValue, alpha);
+	greedyChooseVertex(instance, sortedWeights, chosenVertices, vertexCounter, &vertex, &color, solutionValue, alpha);
 	
-	chosenVertexes[vertex] = 1;
+	chosenVertices[vertex] = 1;
 	colorVertex(*solution, vertex, color);
 
 	solutionValue->colorValues[color] += instance->weights[vertex];
+	(*solution)->numVertexPerColor[color]++;
 
 	vertexCounter++;
     }
