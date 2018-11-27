@@ -7,11 +7,23 @@ int grasp(Instance* instance, Solution** solution, SolutionValue* value, unsigne
 	if (newSolution(solution, instance) != 0) { return -1; }
     }
     
-    Solution* currentSolution, *bestSolution;
+    Solution* currentSolution = NULL;
+    Solution* bestSolution = NULL;
+ 
     SolutionValue bestSolutionValue, currentSolutionValue;
 
-    VertexWeight* sortedWeights;
+    newSolution(&bestSolution, instance);
+    newSolution(&currentSolution, instance);
+    
+    bestSolutionValue.colorValues = malloc(sizeof(float) * instance->numColors);
+    currentSolutionValue.colorValues = malloc(sizeof(float) * instance->numColors);
+
+    
+    VertexWeight* sortedWeights = NULL;
     if (sortWeights(instance, &sortedWeights) != 0) { return -1; }
+
+    if (greedySolutionFinder(instance, &bestSolution, &bestSolutionValue, sortedWeights, alpha) != 0) { return -1; }
+    printf("Starting solution : %f\n", bestSolutionValue.bestValue);
     
     unsigned int iterationCounter = 0;
     do
@@ -21,15 +33,24 @@ int grasp(Instance* instance, Solution** solution, SolutionValue* value, unsigne
 
 	if (currentSolutionValue.bestValue < bestSolutionValue.bestValue)
 	{
-	    bestSolution = currentSolution;
-	    bestSolutionValue = currentSolutionValue;
+	    memcpy(bestSolution->coloration, currentSolution->coloration, sizeof(unsigned int) * instance->numVertices);
+	    memcpy(bestSolution->numVertexPerColor, currentSolution->numVertexPerColor, sizeof(unsigned int) * instance->numColors);
+
+	    memcpy(bestSolutionValue.colorValues, currentSolutionValue.colorValues, sizeof(float) * instance->numColors);
+	    bestSolutionValue.bestValue = currentSolutionValue.bestValue;
+	    printf("Found better: %f\n", bestSolutionValue.bestValue);
 	}
 
 	iterationCounter++;
     } while(iterationCounter < numIterations);
     
-    *solution = bestSolution;
-    *value = bestSolutionValue;
+    memcpy((*solution)->coloration, bestSolution->coloration, sizeof(unsigned int) * instance->numVertices);
+    memcpy((*solution)->numVertexPerColor, bestSolution->numVertexPerColor, sizeof(unsigned int) * instance->numColors);
+
+    memcpy(value->colorValues, bestSolutionValue.colorValues, sizeof(float) * instance->numColors);
+    value->bestValue = bestSolutionValue.bestValue;
+
+    printf("Final solution value: %f\n", value->bestValue);
     
     return 0;
 }
