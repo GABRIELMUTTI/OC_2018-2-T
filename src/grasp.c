@@ -39,8 +39,6 @@ int grasp(Instance* instance, Solution** solution, SolutionValue* value, unsigne
     unsigned int iterationCounter = 0;
     do
     {
-	printf("Iteration %d\n", iterationCounter);
-	
 	if (greedySolutionFinder(instance, &currentSolution, &currentSolutionValue, sortedWeights, alpha) != 0) { return -1; }
 	currentSolution->isFactible = checkFactibility(instance, currentSolution);
 	
@@ -60,7 +58,7 @@ int grasp(Instance* instance, Solution** solution, SolutionValue* value, unsigne
 		printf("Found better: %f <%d>\n", bestSolutionValue.bestValue, bestSolution->isFactible);
 	    }
 	}
-
+	
 	iterationCounter++;
     } while(iterationCounter < numIterations);
     
@@ -73,6 +71,9 @@ int grasp(Instance* instance, Solution** solution, SolutionValue* value, unsigne
 
     (*solution)->isFactible = checkFactibility(instance, *solution);
     printf("Final solution value: %f <%d %d>\n", value->bestValue, (*solution)->isFactible, bestSolution->isFactible);
+
+    free(bestSolutionValue.colorValues);
+    free(currentSolutionValue.colorValues);
     
     return 0;
 }
@@ -89,6 +90,7 @@ int greedySolutionFinder(Instance* instance, Solution** solution, SolutionValue*
     for (i = 0; i < instance->numColors; i++)
     {
 	(*solution)->numVertexPerColor[i] = 0;
+	solutionValue->colorValues[i] = 0.0f;
     }
    
     // Initializer chosenVertices.
@@ -253,6 +255,7 @@ int bestImprovementLocalSearch(Instance* instance, Solution* solution, SolutionV
 	    solutionValue->colorValues[bestNeighbour.inColor] = bestNeighbourInColorValue;
 	}
 
+	free(neighbours);
 	
     } while(haveImproved);
 

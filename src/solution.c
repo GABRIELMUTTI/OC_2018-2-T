@@ -29,9 +29,9 @@ int checkFactibility(Instance* instance, Solution* solution)
 	for (j = 0; j < instance->numVertices; j++)
 	{
 	    int areSameColors = solution->coloration[i] == solution->coloration[j];
-	    int edge = existsEdge(instance, i, j);
+	    int existsEdge = instance->graph[i][j];
 	    
-	    if (areSameColors && i != j && edge)
+	    if (areSameColors && i != j && existsEdge)
 	    {
 		return 0;
 	    }
@@ -79,15 +79,22 @@ SolutionValue getValue(Instance* instance, Solution* solution)
 int checkVertexFactibility(Instance* instance, Solution* solution, unsigned int vertex)
 {
     unsigned int i;
-
     unsigned int vertexColor = solution->coloration[vertex];
-    for (i = 0; i < instance->numVertices; i++)
-    {
-	if (instance->graph[vertex][i] == 1 && solution->coloration[i] == vertexColor)
-	{
-	    return 0;
-	}
-    }
 
-    return 1;
+    if (solution->isFactible)
+    {
+	for (i = 0; i < instance->numVertices; i++)
+	{
+	    if (i != vertex && instance->graph[vertex][i] == 1 && solution->coloration[i] == vertexColor)
+	    {
+		return 0;
+	    }
+	}
+
+	return 1;
+    }
+    else
+    {
+	return checkFactibility(instance, solution);
+    }
 }
