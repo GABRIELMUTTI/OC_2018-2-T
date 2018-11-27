@@ -90,7 +90,7 @@ int greedyChooseVertex(Instance* instance, VertexWeight* sortedWeights, unsigned
 	unsigned int i;
 	for (i = nextVertexIndex; i < instance->numVertices; i++)
 	{
-	    if (chosenVertices[i] != 1)
+	    if (chosenVertices[sortedWeights[i].vertex] != 1)
 	    {
 		nextVertexIndex = i + 1;
 		rcl[rclCounter] = sortedWeights[i].vertex;
