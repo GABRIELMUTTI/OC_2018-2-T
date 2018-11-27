@@ -41,7 +41,20 @@ int testFindNeighbours(const char* filepath)
     {
 	return TST_ERR_FIND_NEIGHBOURS;
     }
+
+    printf("numNeighbours: %d\n", numNeighbours);
+
+    for (i = 0; i < numNeighbours; i++)
+    {
+	printf("v %d: %d -> %d\n", neighbours[i].vertex, neighbours[i].outColor, neighbours[i].inColor);
+    }
     
-    
+    return 0;
+}
+
+int main()
+{
+    testFindNeighbours("/home/gabriel/Documents/ufrgs/courses/oc/trab/instances/tst_cmb01");
+
     return 0;
 }
