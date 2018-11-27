@@ -136,44 +136,53 @@ int greedyChooseVertex(Instance* instance, VertexWeight* sortedWeights, unsigned
 int bestImprovementLocalSearch(Instance* instance, Solution* solution, SolutionValue* solutionValue)
 {
     unsigned int numNeighbours;
-    SolutionValue bestValue, neighbourValue;
     Neighbour* neighbours;
-    Solution* bestSolution;
 
-    bestValue = *solutionValue;
-    bestSolution = solution;
+    // neighbourValue.colorValues = malloc(sizeof(float) * instance->numColors);
+    //if (neighbourValue.colorValues == NULL) { return -1; }
     
-    int haveImproved = 1;
+    Neighbour bestNeighbour;
+    // bestValue = *solutionValue;
+    
+    int haveImproved;
     unsigned int i;
     do
     {
-	if (findNeighbours(instance, bestSolution, &neighbours, &numNeighbours) != 0) { return -1; }
+	if (findNeighbours(instance, solution, &neighbours, &numNeighbours) != 0) { return -1; }
 	
-	neighbourValue = bestValue;
+//	neighbourValue.bestValue = solutionValue->bestValue;
+
+	float neighbourInColorValue, neighbourOutColorValue;
+	float bestNeighbourInColorValue, bestNeighbourOutColorValue;
+	haveImproved = 0;
 	for (i = 0; i < numNeighbours; i++)
 	{
 	    unsigned int changedVertex = neighbours[i].vertex;
 	    unsigned int inColor = neighbours[i].inColor;
 	    unsigned int outColor = neighbours[i].outColor;
 		   
-	    neighbourValue.colorValues[outColor] -= instance->weights[changedVertex];
-	    neighbourValue.colorValues[inColor] += instance->weights[changedVertex];
+	    neighbourOutColorValue = solutionValue->colorValues[outColor] - instance->weights[changedVertex];
+	    neighbourInColorValue = solutionValue->colorValues[inColor] + instance->weights[changedVertex];
 
-	    if (neighbourValue.colorValues[inColor] < neighbourValue.bestValue)
+	    if (neighbourOutColorValue < solutionValue->bestValue)
 	    {
-		neighbourValue.bestValue = neighbourValue.colorValues[inColor];
-	    }
-	    
-	    if (neighbourValue.bestValue < bestValue.bestValue)
-	    {
-		colorVertex(bestSolution, changedVertex, inColor);
-		bestValue = neighbourValue;
+		solutionValue->bestValue = neighbourOutColorValue;
+		bestNeighbourInColorValue = neighbourInColorValue;
+		bestNeighbourOutColorValue = neighbourOutColorValue;
+		bestNeighbour = neighbours[i];
+		haveImproved = 1;
 	    }
 	}
-		
-    } while(haveImproved);
 
-    *solutionValue = bestValue;
+	if (haveImproved)
+	{
+	    solution->coloration[bestNeighbour.vertex] = bestNeighbour.inColor;
+	    solutionValue->colorValues[bestNeighbour.outColor] = bestNeighbourOutColorValue;
+	    solutionValue->colorValues[bestNeighbour.inColor] = bestNeighbourInColorValue;
+	}
+
+	
+    } while(haveImproved);
     
     return 0;
 }
