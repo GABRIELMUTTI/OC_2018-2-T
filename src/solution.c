@@ -5,7 +5,7 @@ int newSolution(Solution** solution, Instance* instance)
     *solution = malloc(sizeof(Solution));
     if (*solution == NULL) { return ERR_MALLOC; }
 
-    (*solution)->coloration = malloc(sizeof(unsigned int*) * instance->numColors);
+    (*solution)->coloration = malloc(sizeof(unsigned int) * instance->numVertices);
     if ((*solution)->coloration == NULL) { return ERR_MALLOC; }
 
     (*solution)->numVertexPerColor = malloc(sizeof(unsigned int) * instance->numColors);
