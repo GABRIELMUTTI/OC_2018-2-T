@@ -188,28 +188,26 @@ int findNeighbours(Instance* instance, Solution* solution, Neighbour** neighbour
 	for (j = 0; j < instance->numColors; j++)
 	{
 	    if (i != j)
-	    {
-		local_numNeighbours += solution->numVertexPerColor[i] * solution->numVertexPerColor[j];
+	    {	
+		local_numNeighbours += solution->numVertexPerColor[j];	    
 	    }
 	}
     }
     
-    
     Neighbour* local_neighbours = malloc(sizeof(Neighbour) * local_numNeighbours);
-    if (local_neighbours == 0) { return -1; }
+    if (local_neighbours == NULL) { return -1; }
 
+    unsigned int neighboursCount = 0;
     for (i = 0; i < instance->numColors; i++)
     {
 	for (j = 0; j < instance->numVertices; j++)
 	{
 	    if (solution->coloration[j] != i)
 	    {
-		Neighbour neighbour;
-		neighbour.inColor = i;
-		neighbour.outColor = solution->coloration[j];
-		neighbour.vertex = j;
-		
-		local_neighbours[j] = neighbour;
+		local_neighbours[neighboursCount].inColor = i;
+		local_neighbours[neighboursCount].outColor = solution->coloration[j];
+		local_neighbours[neighboursCount].vertex = j;
+		neighboursCount++;
 	    }
 	}
     }
