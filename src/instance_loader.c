@@ -47,6 +47,8 @@ int loadInstance(Instance** instancePtr, const char* filepath)
 	
 	free(line);
     }
+
+    fclose(file);
     
     return 0;
 }

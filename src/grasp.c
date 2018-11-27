@@ -18,6 +18,14 @@ int grasp(Instance* instance, Solution** solution, SolutionValue* value, unsigne
     bestSolutionValue.colorValues = malloc(sizeof(float) * instance->numColors);
     currentSolutionValue.colorValues = malloc(sizeof(float) * instance->numColors);
 
+    unsigned int i;
+    for (i = 0; i < instance->numColors; i++)
+    {
+	bestSolutionValue.colorValues[i] = 0.0f;
+	currentSolutionValue.colorValues[i] = 0.0f;
+	bestSolutionValue.bestValue = 0.0f;
+	currentSolutionValue.bestValue = 0.0f;
+    }
     
     VertexWeight* sortedWeights = NULL;
     if (sortWeights(instance, &sortedWeights) != 0) { return -1; }
@@ -63,7 +71,8 @@ int grasp(Instance* instance, Solution** solution, SolutionValue* value, unsigne
     memcpy(value->colorValues, bestSolutionValue.colorValues, sizeof(float) * instance->numColors);
     value->bestValue = bestSolutionValue.bestValue;
 
-    printf("Final solution value: %f <%d>\n", value->bestValue, (*solution)->isFactible);
+    (*solution)->isFactible = checkFactibility(instance, *solution);
+    printf("Final solution value: %f <%d %d>\n", value->bestValue, (*solution)->isFactible, bestSolution->isFactible);
     
     return 0;
 }
@@ -97,7 +106,7 @@ int greedySolutionFinder(Instance* instance, Solution** solution, SolutionValue*
 	greedyChooseVertex(instance, sortedWeights, chosenVertices, vertexCounter, &vertex, &color, solutionValue, alpha);
 	
 	chosenVertices[vertex] = 1;
-	colorVertex(*solution, vertex, color);
+	(*solution)->coloration[vertex] = color;
 
 	solutionValue->colorValues[color] += instance->weights[vertex];
 	(*solution)->numVertexPerColor[color]++;
