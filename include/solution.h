@@ -13,6 +13,7 @@ typedef struct solution_s
 {
     unsigned int* coloration;
     unsigned int* numVertexPerColor;
+    int isFactible;
     
 } Solution;
 
@@ -30,6 +31,7 @@ void destroySolution(Solution* solution);
 
 // Functions:
 int checkFactibility(Instance* instance, Solution* solution);
+int checkVertexFactibility(Instance* instance, Solution* solution, unsigned int vertex);
 void colorVertex(Solution* solution, unsigned int vertex, unsigned int color);
 SolutionValue getValue(Instance* instance, Solution* solution);
 

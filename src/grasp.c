@@ -23,24 +23,34 @@ int grasp(Instance* instance, Solution** solution, SolutionValue* value, unsigne
     if (sortWeights(instance, &sortedWeights) != 0) { return -1; }
 
     if (greedySolutionFinder(instance, &bestSolution, &bestSolutionValue, sortedWeights, alpha) != 0) { return -1; }
-    printf("Starting solution : %f\n", bestSolutionValue.bestValue);
-    
+
+    bestSolution->isFactible = checkFactibility(instance, *solution);
+    printf("Starting solution : %f <%d>\n", bestSolutionValue.bestValue, bestSolution->isFactible);
+
+   
     unsigned int iterationCounter = 0;
     do
     {
 	printf("Iteration %d\n", iterationCounter);
 	
 	if (greedySolutionFinder(instance, &currentSolution, &currentSolutionValue, sortedWeights, alpha) != 0) { return -1; }
+	currentSolution->isFactible = checkFactibility(instance, currentSolution);
+	
 	if (bestImprovementLocalSearch(instance, currentSolution, &currentSolutionValue)) { return -2; }
 
 	if (currentSolutionValue.bestValue < bestSolutionValue.bestValue)
 	{
-	    memcpy(bestSolution->coloration, currentSolution->coloration, sizeof(unsigned int) * instance->numVertices);
-	    memcpy(bestSolution->numVertexPerColor, currentSolution->numVertexPerColor, sizeof(unsigned int) * instance->numColors);
+	    if ((!bestSolution->isFactible) || currentSolution->isFactible)
+	    {
+		memcpy(bestSolution->coloration, currentSolution->coloration, sizeof(unsigned int) * instance->numVertices);
+		memcpy(bestSolution->numVertexPerColor, currentSolution->numVertexPerColor, sizeof(unsigned int) * instance->numColors);
 
-	    memcpy(bestSolutionValue.colorValues, currentSolutionValue.colorValues, sizeof(float) * instance->numColors);
-	    bestSolutionValue.bestValue = currentSolutionValue.bestValue;
-	    printf("Found better: %f\n", bestSolutionValue.bestValue);
+		memcpy(bestSolutionValue.colorValues, currentSolutionValue.colorValues, sizeof(float) * instance->numColors);
+		bestSolutionValue.bestValue = currentSolutionValue.bestValue;
+		bestSolution->isFactible = currentSolution->isFactible;
+		
+		printf("Found better: %f <%d>\n", bestSolutionValue.bestValue, bestSolution->isFactible);
+	    }
 	}
 
 	iterationCounter++;
@@ -48,11 +58,12 @@ int grasp(Instance* instance, Solution** solution, SolutionValue* value, unsigne
     
     memcpy((*solution)->coloration, bestSolution->coloration, sizeof(unsigned int) * instance->numVertices);
     memcpy((*solution)->numVertexPerColor, bestSolution->numVertexPerColor, sizeof(unsigned int) * instance->numColors);
-
+    (*solution)->isFactible = bestSolution->isFactible;
+    
     memcpy(value->colorValues, bestSolutionValue.colorValues, sizeof(float) * instance->numColors);
     value->bestValue = bestSolutionValue.bestValue;
 
-    printf("Final solution value: %f\n", value->bestValue);
+    printf("Final solution value: %f <%d>\n", value->bestValue, (*solution)->isFactible);
     
     return 0;
 }
@@ -164,6 +175,7 @@ int bestImprovementLocalSearch(Instance* instance, Solution* solution, SolutionV
 
     unsigned int i, j;
     int haveImproved;
+    int isBestSolutionFactible = checkFactibility(instance, solution);
 
     do
     {
@@ -181,6 +193,7 @@ int bestImprovementLocalSearch(Instance* instance, Solution* solution, SolutionV
 	    neighbourOutColorValue = solutionValue->colorValues[outColor] - instance->weights[changedVertex];
 	    neighbourInColorValue = solutionValue->colorValues[inColor] + instance->weights[changedVertex];
 
+	    // Finds the heaviest color value.
 	    float heaviestColorValue = -1.0f;
 	    for (j = 0; j < instance->numColors; j++)
 	    {
@@ -203,21 +216,30 @@ int bestImprovementLocalSearch(Instance* instance, Solution* solution, SolutionV
 		    heaviestColorValue = colorValue;
 		}
 	    }
-	    
+
+	    // Updates the best value if it is better, considering the factibility.
 	    if (heaviestColorValue < solutionValue->bestValue)
 	    {
-		solutionValue->bestValue = heaviestColorValue;
-		bestNeighbourInColorValue = neighbourInColorValue;
-		bestNeighbourOutColorValue = neighbourOutColorValue;
-		bestNeighbour = neighbours[i];
-		
-		haveImproved = 1;
+		solution->coloration[changedVertex] = inColor;
+		int isNeighbourFactible = checkVertexFactibility(instance, solution, changedVertex);
+		if ((!isBestSolutionFactible) || isNeighbourFactible)
+		{
+		    solutionValue->bestValue = heaviestColorValue;
+	    		    
+		    bestNeighbourInColorValue = neighbourInColorValue;
+		    bestNeighbourOutColorValue = neighbourOutColorValue;
+		    bestNeighbour = neighbours[i];
+
+		    isBestSolutionFactible = isNeighbourFactible;
+		    haveImproved = 1;
+		}
 	    }
 	}
 
 	if (haveImproved)
 	{
 	    solution->coloration[bestNeighbour.vertex] = bestNeighbour.inColor;
+	    solution->isFactible = isBestSolutionFactible;
 	    solutionValue->colorValues[bestNeighbour.outColor] = bestNeighbourOutColorValue;
 	    solutionValue->colorValues[bestNeighbour.inColor] = bestNeighbourInColorValue;
 	}

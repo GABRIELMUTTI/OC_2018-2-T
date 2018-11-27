@@ -75,3 +75,19 @@ SolutionValue getValue(Instance* instance, Solution* solution)
 
     return solutionValue;
 }
+
+int checkVertexFactibility(Instance* instance, Solution* solution, unsigned int vertex)
+{
+    unsigned int i;
+
+    unsigned int vertexColor = solution->coloration[vertex];
+    for (i = 0; i < instance->numVertices; i++)
+    {
+	if (instance->graph[vertex][i] == 1 && solution->coloration[i] == vertexColor)
+	{
+	    return 0;
+	}
+    }
+
+    return 1;
+}
