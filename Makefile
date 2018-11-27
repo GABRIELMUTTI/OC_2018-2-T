@@ -6,7 +6,7 @@ SRC := src
 BIN := bin
 EXECUTABLE := main
 INCLUDES := include
-INCLUDE := -Iinclude/
+INCLUDE := -Iinclude/ -Iinclude/test
 
 all: $(BIN)/$(EXECUTABLE)
 
@@ -16,6 +16,6 @@ clean:
 run:
 	./$(BIN)/$(EXECUTABLE)
 
-$(BIN)/$(EXECUTABLE): $(SRC)/*.c $(INCLUDES)/*.h
+$(BIN)/$(EXECUTABLE): $(SRC)/*.c $(SRC)/**/*.c $(INCLUDES)/*.h $(INCLUDES)/**/*.h
 	$(COMPILER) $(COMPILER_FLAGS) $(INCLUDE) $^ -o $@ $(LINKER_FLAGS)
 

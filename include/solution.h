@@ -12,8 +12,15 @@
 typedef struct solution_s
 {
     unsigned int* coloration;
+    unsigned int* numVertexPerColor;
     
 } Solution;
+
+typedef struct solutionValue_s
+{
+    float* colorValues;
+    float bestValue;
+} SolutionValue;
 
 // Construtor:
 int newSolution(Solution** solution, Instance* instance);
@@ -24,6 +31,7 @@ void destroySolution(Solution* solution);
 // Functions:
 int checkFactibility(Instance* instance, Solution* solution);
 void colorVertex(Solution* solution, unsigned int vertex, unsigned int color);
+SolutionValue getValue(Instance* instance, Solution* solution);
 
 #endif // __SOLUTION_H__
 
