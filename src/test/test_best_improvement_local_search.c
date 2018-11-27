@@ -2,6 +2,7 @@
 
 int testBestImprovementLocalSearch(const char* filepath)
 {
+    const float EPSILON = 1e-4;
     Instance* instance = NULL;
 
     time_t seed = 1;
@@ -40,14 +41,40 @@ int testBestImprovementLocalSearch(const char* filepath)
 	return TST_ERR_BEST_IMPROVEMENT_LOCAL_SEARCH;
     }
 
-    
-    return 0;
-}
+    // Checks if the color values are valid.
+    float colorValues[instance->numColors];
+    for (i = 0; i < instance->numColors; i++)
+    {
+	colorValues[i] = 0;
+    }
 
-int main()
-{
+    for (i = 0; i < instance->numVertices; i++)
+    {
+	colorValues[solution->coloration[i]] += instance->weights[i];
+    }
 
-    testBestImprovementLocalSearch("/home/gabriel/Documents/ufrgs/courses/oc/trab/instances/tst_cmb02");
+    for (i = 0; i < instance->numColors; i++)
+    {
+	if (colorValues[i] != 0.0f && fabs(solutionValue.colorValues[i] - colorValues[i]) / colorValues[i] > EPSILON)
+	{
+	    return TST_ERR_WRONG_COLOR_VALUES;
+	}
+    }
+
+    // Checks if the heaviest color value is valid.
+    unsigned int heaviestColor = 0;
+    for (i = 1; i < instance->numColors; i++)
+    {
+	if (solutionValue.colorValues[i] > solutionValue.colorValues[heaviestColor])
+	{
+	    heaviestColor = i;
+	}
+    }
+
+    if (fabs(solutionValue.colorValues[heaviestColor] - solutionValue.bestValue) > EPSILON)
+    {
+	return TST_ERR_WRONG_BEST_VALUE;
+    }
     
     return 0;
 }

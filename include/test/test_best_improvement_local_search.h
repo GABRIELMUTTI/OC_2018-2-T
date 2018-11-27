@@ -14,6 +14,8 @@
 #define TST_ERR_SORT_WEIGHTS -2
 #define TST_ERR_GREEDY_SOLUTION_FINDER -3
 #define TST_ERR_BEST_IMPROVEMENT_LOCAL_SEARCH -4
+#define TST_ERR_WRONG_COLOR_VALUES -5
+#define TST_ERR_WRONG_BEST_VALUE -6
 
 int testBestImprovementLocalSearch(const char* filepath);
 

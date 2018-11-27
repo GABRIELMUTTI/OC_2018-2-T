@@ -136,21 +136,16 @@ int bestImprovementLocalSearch(Instance* instance, Solution* solution, SolutionV
 {
     unsigned int numNeighbours;
     Neighbour* neighbours;
-
-    // neighbourValue.colorValues = malloc(sizeof(float) * instance->numColors);
-    //if (neighbourValue.colorValues == NULL) { return -1; }
     
     Neighbour bestNeighbour;
-    // bestValue = *solutionValue;
-    
+
+    unsigned int i, j;
     int haveImproved;
-    unsigned int i;
+
     do
     {
 	if (findNeighbours(instance, solution, &neighbours, &numNeighbours) != 0) { return -1; }
 	
-//	neighbourValue.bestValue = solutionValue->bestValue;
-
 	float neighbourInColorValue, neighbourOutColorValue;
 	float bestNeighbourInColorValue, bestNeighbourOutColorValue;
 	haveImproved = 0;
@@ -163,12 +158,36 @@ int bestImprovementLocalSearch(Instance* instance, Solution* solution, SolutionV
 	    neighbourOutColorValue = solutionValue->colorValues[outColor] - instance->weights[changedVertex];
 	    neighbourInColorValue = solutionValue->colorValues[inColor] + instance->weights[changedVertex];
 
-	    if (neighbourOutColorValue < solutionValue->bestValue)
+	    float heaviestColorValue = -1.0f;
+	    for (j = 0; j < instance->numColors; j++)
 	    {
-		solutionValue->bestValue = neighbourOutColorValue;
+		float colorValue;
+		if (j == inColor)
+		{
+		    colorValue = neighbourInColorValue;
+		}
+		else if (j == outColor)
+		{
+		    colorValue = neighbourOutColorValue;
+		}
+		else
+		{
+		    colorValue = solutionValue->colorValues[j];
+		}
+
+		if (colorValue > heaviestColorValue)
+		{
+		    heaviestColorValue = colorValue;
+		}
+	    }
+	    
+	    if (heaviestColorValue < solutionValue->bestValue)
+	    {
+		solutionValue->bestValue = heaviestColorValue;
 		bestNeighbourInColorValue = neighbourInColorValue;
 		bestNeighbourOutColorValue = neighbourOutColorValue;
 		bestNeighbour = neighbours[i];
+		
 		haveImproved = 1;
 	    }
 	}
@@ -182,7 +201,7 @@ int bestImprovementLocalSearch(Instance* instance, Solution* solution, SolutionV
 
 	
     } while(haveImproved);
-    
+
     return 0;
 }
 
