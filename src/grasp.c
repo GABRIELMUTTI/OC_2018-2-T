@@ -74,7 +74,7 @@ int greedySolutionFinder(Instance* instance, Solution** solution, SolutionValue*
     solutionValue->bestValue = solutionValue->colorValues[0];
     for (i = 1; i < instance->numColors; i++)
     {
-	if (solutionValue->colorValues[i] < solutionValue->bestValue)
+	if (solutionValue->colorValues[i] > solutionValue->bestValue)
 	{
 	    solutionValue->bestValue = solutionValue->colorValues[i];
 	}
@@ -113,7 +113,6 @@ int greedyChooseVertex(Instance* instance, VertexWeight* sortedWeights, unsigned
     }
 
     // Finds the lightest color.
-
     unsigned int lightestColor = 0;
     unsigned int i;
     for (i = 1; i < instance->numColors; i++)
