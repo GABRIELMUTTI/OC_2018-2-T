@@ -16,9 +16,6 @@
 #define TST_ERR_GREEDY_SOLUTION_FINDER -4
 #define TST_ERR_WRONG_COLOR_VALUES -5
 
-
-
 int testGreedySolutionFinder(const char* filepath);
-int testMain();
 
 #endif // __TEST_GREEDY_SOLUTION_FINDER_H_
