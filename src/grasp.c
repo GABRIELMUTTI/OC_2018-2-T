@@ -28,6 +28,8 @@ int grasp(Instance* instance, Solution** solution, SolutionValue* value, unsigne
     unsigned int iterationCounter = 0;
     do
     {
+	printf("Iteration %d\n", iterationCounter);
+	
 	if (greedySolutionFinder(instance, &currentSolution, &currentSolutionValue, sortedWeights, alpha) != 0) { return -1; }
 	if (bestImprovementLocalSearch(instance, currentSolution, &currentSolutionValue)) { return -2; }
 
