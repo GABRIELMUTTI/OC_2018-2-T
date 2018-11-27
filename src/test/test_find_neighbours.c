@@ -3,7 +3,6 @@
 
 int testFindNeighbours(const char* filepath)
 {
-    const float EPSILON = 1e-12;
     Instance* instance = NULL;
 
     if (loadInstance(&instance, filepath) != 0)
@@ -35,6 +34,11 @@ int testFindNeighbours(const char* filepath)
 	return TST_ERR_GREEDY_SOLUTION_FINDER;
     }
 
+    for (i = 0; i < instance->numVertices; i++)
+    {
+	printf("v%d color: %d\n", i, solution->coloration[i]);
+    }
+    
     unsigned int numNeighbours;
     Neighbour* neighbours = NULL;
     if (findNeighbours(instance, solution, &neighbours, &numNeighbours) != 0)
@@ -49,12 +53,5 @@ int testFindNeighbours(const char* filepath)
 	printf("v %d: %d -> %d\n", neighbours[i].vertex, neighbours[i].outColor, neighbours[i].inColor);
     }
     
-    return 0;
-}
-
-int main()
-{
-    testFindNeighbours("/home/gabriel/Documents/ufrgs/courses/oc/trab/instances/tst_cmb01");
-
     return 0;
 }
