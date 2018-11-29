@@ -1,10 +1,13 @@
 #include "../include/local_search.h"
 
-int bestImprovementLocalSearch(Instance* instance, Solution* solution, SolutionValue* solutionValue, unsigned int numConflicts, unsigned int maxDegree)
+int bestImprovementLocalSearch(Instance* instance, Solution* solution, SolutionValue* solutionValue, unsigned int* numConflicts, unsigned int maxDegree)
 {
     unsigned int neighbours[maxDegree];
     unsigned int neighboursColor[maxDegree];
     unsigned int neighboursColorCount[instance->numColors];
+    int local_numConflicts = *numConflicts;
+
+//    printf("before local factible: %d\n", solution->isFactible);
     
     int haveImproved;
     do
@@ -27,18 +30,28 @@ int bestImprovementLocalSearch(Instance* instance, Solution* solution, SolutionV
 		{
 		    solution->coloration[i] = j;
 		    unsigned int numNeighbourConflicts = neighboursColorCount[j];
+
+		    float inColorValue = solutionValue->colorValues[j] + instance->weights[i];
+		    float outColorValue = solutionValue->colorValues[vertexColor] - instance->weights[i];
 		    
 		    if (solution->isFactible)
 		    {
 			if (numNeighbourConflicts == 0)
 			{
-			    float inColorValue = solutionValue->colorValues[j] + instance->weights[i];
-			    float outColorValue = solutionValue->colorValues[vertexColor] - instance->weights[i];
+
 
 			    int isHeaviestColor = 1;
 			    for (k = 0; k < instance->numColors; k++)
 			    {
-				if (inColorValue < solutionValue->colorValues[k])
+				if (k == vertexColor)
+				{
+				    if (inColorValue < outColorValue)
+				    {
+					isHeaviestColor = 0;
+					break;
+				    }
+				}
+				else if (inColorValue < solutionValue->colorValues[k])
 				{
 				    isHeaviestColor = 0;
 				    break;
@@ -54,22 +67,18 @@ int bestImprovementLocalSearch(Instance* instance, Solution* solution, SolutionV
 				haveImproved = 1;
 				break;
 			    }
-			    else
-			    {
-				solution->coloration[i] = vertexColor;
-			    }
 			}
 		    }
 		    else
 		    {
-			if (numNeighbourConflicts >= numVertexConflicts)
+			if (numNeighbourConflicts < numVertexConflicts)
 			{
-			    solution->coloration[i] = vertexColor;
-			}
-			else
-			{
-			    numConflicts -= numVertexConflicts;
-			    numConflicts += numNeighbourConflicts;
+			    local_numConflicts -= numVertexConflicts;
+			    local_numConflicts += numNeighbourConflicts;
+
+			    solutionValue->colorValues[vertexColor] = outColorValue;
+			    solutionValue->colorValues[j] = inColorValue;
+			    
 			    haveImproved = 1;
 			    break;
 			}	
@@ -81,6 +90,10 @@ int bestImprovementLocalSearch(Instance* instance, Solution* solution, SolutionV
 		{
 		    break;
 		}
+		else
+		{
+		    solution->coloration[i] = vertexColor;
+		}
 	    }
 		
 	    if (haveImproved)
@@ -90,13 +103,16 @@ int bestImprovementLocalSearch(Instance* instance, Solution* solution, SolutionV
 	    
 	}
 
-	if (numConflicts == 0)
+	if (local_numConflicts == 0)
 	{
 	    solution->isFactible = 1;
+	    updateSolutionValue(instance, solution, solutionValue);
 	}
 	
     } while (haveImproved);
     
+
+    *numConflicts = local_numConflicts;
     
     return 0;
 }
@@ -167,4 +183,21 @@ int checkNeighbourFactible(Instance* instance, Solution* solution, Neighbour nei
     }
 
     return 0;
+}
+
+
+void updateSolutionValue(Instance* instance, Solution* solution, SolutionValue* solutionValue)
+{
+    float heaviestColorValue = solutionValue->colorValues[0];
+    
+    unsigned int i;
+    for (i = 1; i < instance->numColors; i++)
+    {
+	if (solutionValue->colorValues[i] > heaviestColorValue)
+	{
+	    heaviestColorValue = solutionValue->colorValues[i];
+	}
+    }
+
+    solutionValue->bestValue = heaviestColorValue;
 }

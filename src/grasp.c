@@ -9,6 +9,7 @@ int grasp(Instance* instance, Solution** solution, SolutionValue* value, unsigne
     
     Solution* currentSolution = NULL;
     Solution* bestSolution = NULL;
+    unsigned int bestNumConflicts = 0;
  
     SolutionValue bestSolutionValue, currentSolutionValue;
 
@@ -49,22 +50,23 @@ int grasp(Instance* instance, Solution** solution, SolutionValue* value, unsigne
     
     if (greedySolutionFinder(instance, &bestSolution, &bestSolutionValue, alpha) != 0) { return -1; }
     printf("Starting solution: %f <%d>\n", bestSolutionValue.bestValue, bestSolution->isFactible);
-    printf("Num Conflicts: %d\n", countSolutionConflicts(instance, bestSolution));
-    
+    //printf("Num Conflicts: %d\n", countSolutionConflicts(instance, bestSolution));
+    bestNumConflicts = countSolutionConflicts(instance, *solution);
     unsigned int iterationCounter = 0;
     do
     {
-	printf("Iteration %d\n", iterationCounter);
+	//printf("Iteration %d\n", iterationCounter);
 	if (greedySolutionFinder(instance, &currentSolution, &currentSolutionValue, alpha) != 0) { return -1; }
 	unsigned int numConflicts = countSolutionConflicts(instance, currentSolution);
-//	printf("Num Conflicts: %d\n", numConflicts);
+	//	printf("Num Conflicts after greedy: %d\n", numConflicts);
+	//	printf("After Greedy Value: %f <%d>\n", currentSolutionValue.bestValue, currentSolution->isFactible);
 	
-	if (bestImprovementLocalSearch(instance, currentSolution, &currentSolutionValue, numConflicts, maxDegree)) { return -2; }
-//	printf("Num Conflicts: %d\n", countSolutionConflicts(instance, currentSolution));
+	if (bestImprovementLocalSearch(instance, currentSolution, &currentSolutionValue, &numConflicts, maxDegree)) { return -2; }
+	//	printf("After Local Value: %f <%d>, numConflicts: %d\n", currentSolutionValue.bestValue, currentSolution->isFactible, numConflicts);
 	
 	if ((!bestSolution->isFactible) || currentSolution->isFactible)
 	{
-	    if (currentSolutionValue.bestValue < bestSolutionValue.bestValue)
+	    if ((currentSolutionValue.bestValue < bestSolutionValue.bestValue && numConflicts < bestNumConflicts) || (!bestSolution->isFactible && numConflicts < bestNumConflicts))
 	    {
 		memcpy(bestSolution->coloration, currentSolution->coloration, sizeof(unsigned int) * instance->numVertices);
 		memcpy(bestSolution->numVertexPerColor, currentSolution->numVertexPerColor, sizeof(unsigned int) * instance->numColors);
@@ -72,11 +74,16 @@ int grasp(Instance* instance, Solution** solution, SolutionValue* value, unsigne
 		memcpy(bestSolutionValue.colorValues, currentSolutionValue.colorValues, sizeof(float) * instance->numColors);
 		bestSolutionValue.bestValue = currentSolutionValue.bestValue;
 		bestSolution->isFactible = currentSolution->isFactible;
+		bestNumConflicts = numConflicts;
 		
 		printf("Found better: %f <%d>\n", bestSolutionValue.bestValue, bestSolution->isFactible);
 	    }
 	}
-	
+
+	if (iterationCounter % 100 == 0)
+	{
+	    printf("Iteration: %d\n", iterationCounter);
+	}
 	
 	iterationCounter++;
     } while(iterationCounter < numIterations);

@@ -18,9 +18,9 @@ typedef struct neighbour_s
 } Neighbour;
 
 
-int bestImprovementLocalSearch(Instance* instance, Solution* currentSolution, SolutionValue* solutionValue, unsigned int numConflicts, unsigned int maxDegree);
+int bestImprovementLocalSearch(Instance* instance, Solution* currentSolution, SolutionValue* solutionValue, unsigned int* numConflicts, unsigned int maxDegree);
 int findNeighbours(Instance* instance, Solution* solution, Neighbour** neighbours, unsigned int* numNeighbours);
 int checkNeighbourFactible(Instance* instance, Solution* solution, Neighbour neighbour, unsigned int numConflicts);
-
+void updateSolutionValue(Instance* instance, Solution* solution, SolutionValue* solutionValue);
 
 #endif // __LOCAL_SEARCH_H__

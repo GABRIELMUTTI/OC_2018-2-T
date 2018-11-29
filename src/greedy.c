@@ -20,8 +20,11 @@ int greedySolutionFinder(Instance* instance, Solution** solution, SolutionValue*
     for (i = 0; i < instance->numColors; i++)
     {
 	(*solution)->numVertexPerColor[i] = 0;
+	solutionValue->colorValues[i] = 0.0f;
     }
 
+    solutionValue->bestValue = 0.0f;
+    
     uint numChosenVertices = 0;
     while (numChosenVertices < instance->numVertices)
     {
@@ -57,7 +60,7 @@ int greedySolutionFinder(Instance* instance, Solution** solution, SolutionValue*
 
 void greedyChooseVertex(Instance* instance, Solution* solution, uint* chosenVertices, uint numChosenVertices, uint* vertex, uint* color, uint* conflict, float alpha)
 {
-    uint rclSize = alpha * (instance->numVertices - numChosenVertices);
+    uint rclSize = (1 - alpha) * (instance->numVertices - numChosenVertices);
     if (rclSize == 0)
     {
 	rclSize = 1;
