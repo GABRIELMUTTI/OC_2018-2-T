@@ -8,7 +8,7 @@
 #include <stdlib.h>
 #include <time.h>
 
-int main (int argc, char* argv[])
+int main(int argc, char* argv[])
 {
     int numIterations = atoi(argv[1]);
     float alpha = atof(argv[2]);
@@ -30,8 +30,10 @@ int main (int argc, char* argv[])
 
     printf("Done!\n");
     printf("Saving...\n");
+
+    unsigned int conflicts = countSolutionConflicts(instance, solution);
     
-    saveSolution(instance, solution, value, saveFilepath, instanceFilepath, alpha, numIterations);
+    saveSolution(instance, solution, conflicts, value, saveFilepath, instanceFilepath, alpha, numIterations);
     
     return 0;
 }

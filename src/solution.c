@@ -25,13 +25,10 @@ int checkFactibility(Instance* instance, Solution* solution)
     unsigned int i;
     unsigned int j;
     for (i = 0; i < instance->numVertices; i++)
-    {
-	for (j = 0; j < instance->numVertices; j++)
+    {	
+	for (j = i + 1; j < instance->numVertices; j++)
 	{
-	    int areSameColors = solution->coloration[i] == solution->coloration[j];
-	    int existsEdge = instance->graph[i][j];
-	    
-	    if (areSameColors && i != j && existsEdge)
+	    if (instance->graph[i][j] == 1 && solution->coloration[i] == solution->coloration[j])
 	    {
 		return 0;
 	    }
@@ -81,20 +78,114 @@ int checkVertexFactibility(Instance* instance, Solution* solution, unsigned int 
     unsigned int i;
     unsigned int vertexColor = solution->coloration[vertex];
 
-    if (solution->isFactible)
+    for (i = 0; i < instance->numVertices; i++)
     {
-	for (i = 0; i < instance->numVertices; i++)
+	if (i != vertex && instance->graph[vertex][i] == 1 && solution->coloration[i] == vertexColor)
 	{
-	    if (i != vertex && instance->graph[vertex][i] == 1 && solution->coloration[i] == vertexColor)
+	    return 0;
+	}
+    }
+    
+    return 1;
+}
+
+int countConflicts(Instance* instance, Solution* solution, unsigned int vertex)
+{
+    int conflicts = 0;
+    
+    unsigned int i;
+    for (i = 0; i < instance->numVertices; i++)
+    {
+	if (i != vertex && solution->coloration[i] == solution->coloration[vertex] && instance->graph[vertex][i] == 1)
+	{
+	    conflicts++;
+	}
+	
+    }
+
+    return conflicts;
+}
+
+unsigned int countSolutionConflicts(Instance* instance, Solution* solution)
+{
+    unsigned int conflicts = 0;
+
+    unsigned int i, j;
+
+    for (i = 0; i < instance->numVertices; i++)
+    {
+	for (j = i + 1; j < instance->numVertices; j++)
+	{
+	    if (solution->coloration[i] == solution->coloration[j] && instance->graph[i][j] == 1)
 	    {
-		return 0;
+		conflicts++;
 	    }
 	}
+    }
 
-	return 1;
-    }
-    else
+
+    return conflicts;
+}
+
+void getVertexNeighbours(Instance* instance, Solution* solution, uint vertex, uint** out_neighbours, uint** out_neighboursColor, uint* out_numNeighbours)
+{
+    *out_neighbours = malloc(sizeof(uint) * instance->numVertices);
+    *out_neighboursColor = malloc(sizeof(uint) * instance->numVertices);
+    *out_numNeighbours = 0;
+    
+    uint i;
+    for (i = 0; i < instance->numVertices; i++)
     {
-	return checkFactibility(instance, solution);
+	if (instance->graph[vertex][i] == 1 && vertex != i)
+	{
+	    (*out_neighbours)[*out_numNeighbours] = i;
+	    (*out_neighboursColor)[*out_numNeighbours] = solution->coloration[i];
+	    (*out_numNeighbours)++;
+	}
     }
+}
+
+void getVertexNeighboursInfo(Instance* instance, Solution* solution, uint vertex, uint* out_neighbours, uint* out_neighboursColor, uint* out_colorCounts, uint* out_numConflicts, uint* out_numNeighbours)
+{
+    *out_numNeighbours = 0;
+    *out_numConflicts = 0;
+
+    uint i;
+    for (i = 0; i < instance->numColors; i++)
+    {
+	out_colorCounts[i] = 0;
+    }
+
+    uint vertexColor = solution->coloration[vertex];
+    
+  
+    for (i = 0; i < instance->numVertices; i++)
+    {
+	if (instance->graph[vertex][i] == 1 && vertex != i)
+	{
+	    uint neighbourColor = solution->coloration[i];
+	    
+	    out_neighbours[*out_numNeighbours] = i;
+	    out_neighboursColor[*out_numNeighbours] = neighbourColor;
+	    out_colorCounts[neighbourColor]++;
+	    (*out_numNeighbours)++;
+
+	    if (vertexColor == neighbourColor)
+	    {
+		(*out_numConflicts)++;
+	    }
+	}
+    }
+}
+
+
+void printSolution(Instance* instance, Solution* solution)
+{
+    printf("Solution:\n");
+    unsigned int i;
+    for (i = 0; i < instance->numVertices; i++)
+    {
+	printf("\tv %d -> c %d\n", i, solution->coloration[i]);	    
+    }
+    
 }

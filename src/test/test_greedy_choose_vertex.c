@@ -3,18 +3,14 @@
 int testGreedyChooseVertex(const char* filepath)
 {
     Instance* instance = NULL;
+    Solution* solution = NULL;
+    newSolution(&solution, instance);
 
     if (loadInstance(&instance, filepath) != 0)
     {
 	return TST_ERR_LOAD_INSTANCE;
     }
     
-    VertexWeight* sortedWeights = NULL;
-    if (sortWeights(instance, &sortedWeights) != 0)
-    {
-	return TST_ERR_SORT_WEIGHTS;
-    }
-
     unsigned int chosenVertices[instance->numVertices];
     unsigned int i;
     for (i = 0; i < instance->numVertices; i++)
@@ -23,7 +19,7 @@ int testGreedyChooseVertex(const char* filepath)
     }
 
     unsigned int numChosenVertices = 0;
-    unsigned int vertex, color;
+    unsigned int vertex, color, conflict;
     SolutionValue solutionValue;
     solutionValue.bestValue = 0.0f;
     solutionValue.colorValues = malloc(sizeof(float) * instance->numColors);
@@ -34,10 +30,7 @@ int testGreedyChooseVertex(const char* filepath)
 	solutionValue.colorValues[i] = 0.0f;
     }
     
-    if (greedyChooseVertex(instance, sortedWeights, chosenVertices, numChosenVertices, &vertex, &color, &solutionValue, alpha) != 0)
-    {
-	return TST_ERR_GREEDY_CHOOSE_VERTEX;
-    }
+    greedyChooseVertex(instance, solution, chosenVertices, numChosenVertices, &vertex, &color, &conflict, alpha);
 
     printf("Vertex: %d\n", vertex);
     printf("Weight: %f\n", instance->weights[vertex]);

@@ -13,10 +13,10 @@ int testSortWeights(const char* filepath)
 
     VertexWeight* weights = NULL;
 
-    if (sortWeights(instance, &weights) != 0)
-    {
-	return TST_ERR_SORT_WEIGHTS;
-    }
+    //    if (sortWeights(instance, &weights) != 0)
+    //{
+    //	return TST_ERR_SORT_WEIGHTS;
+    //}
 
     // Checks if its sorted.
     unsigned int i;

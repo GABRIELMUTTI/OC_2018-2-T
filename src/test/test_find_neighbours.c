@@ -10,13 +10,6 @@ int testFindNeighbours(const char* filepath)
 	return TST_ERR_LOAD_INSTANCE;
     }
 
-    VertexWeight* sortedWeights = NULL;
-    if (sortWeights(instance, &sortedWeights) != 0)
-    {
-	return TST_ERR_SORT_WEIGHTS;
-    }
-
-
     SolutionValue solutionValue;
     solutionValue.bestValue = 0.0f;
     solutionValue.colorValues = malloc(sizeof(float) * instance->numColors);
@@ -29,10 +22,8 @@ int testFindNeighbours(const char* filepath)
     float alpha = 0.02f;
     
     Solution* solution = NULL;
-    if (greedySolutionFinder(instance, &solution, &solutionValue, sortedWeights, alpha) != 0)
-    {
-	return TST_ERR_GREEDY_SOLUTION_FINDER;
-    }
+    greedySolutionFinder(instance, &solution, &solutionValue, alpha);
+
 
     for (i = 0; i < instance->numVertices; i++)
     {

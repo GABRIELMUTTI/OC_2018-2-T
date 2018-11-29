@@ -1,16 +1,31 @@
 #include "../include/solution_saver.h"
 
-int saveSolution(Instance* instance, Solution* solution, SolutionValue solutionValue, const char* filepath, const char* instanceFilepath, float alpha, unsigned int numIterations)
+int saveSolution(Instance* instance, Solution* solution, unsigned int conflicts, SolutionValue solutionValue, const char* filepath, const char* instanceFilepath, float alpha, unsigned int numIterations)
 {
     time_t currentTime;
     time(&currentTime);
+
+    char* factibleFolderStr = "factible/";
     
     const char* filename = ctime(&currentTime);
 
-    char fullFilepath[strlen(filename) + strlen(filepath)];
+    char fullFilepath[strlen(filename) + strlen(filepath) + strlen(factibleFolderStr)];
     memcpy(fullFilepath, filepath, strlen(filepath));
-    memcpy(fullFilepath + strlen(filepath), filename, strlen(filename) - 1);
-    fullFilepath[strlen(filepath) + strlen(filename) - 1] = '\0';
+    
+    
+    if (solution->isFactible)
+    {
+	memcpy(fullFilepath + strlen(filepath), factibleFolderStr, strlen(factibleFolderStr));
+	memcpy(fullFilepath + strlen(filepath) + strlen(factibleFolderStr), filename, strlen(filename) - 1);
+	fullFilepath[strlen(filepath) + strlen(filename) + strlen(factibleFolderStr) - 1] = '\0';
+
+	printf("fullpath: %s\n", fullFilepath);
+    }
+    else
+    {
+	memcpy(fullFilepath + strlen(filepath), filename, strlen(filename) - 1);
+	fullFilepath[strlen(filepath) + strlen(filename) - 1] = '\0';
+    }
     
     FILE* file = fopen(fullFilepath, "w");
 
@@ -34,8 +49,9 @@ int saveSolution(Instance* instance, Solution* solution, SolutionValue solutionV
     
     
     fprintf(file, "Is Factible?: %s\n", factibleStr);
+    fprintf(file, "Conflicts: %d\n", conflicts);
     fprintf(file, "Solution Value: %f\n", solutionValue.bestValue);
-    fprintf(file, "\tVertex,\tColor\n");
+    fprintf(file, "Vertex,\tColor\n");
     
     unsigned int i;
     for (i = 0; i < instance->numVertices; i++)

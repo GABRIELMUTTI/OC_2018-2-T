@@ -8,7 +8,7 @@
 #include <string.h>
 #include <time.h>
 
-int saveSolution(Instance* instance, Solution* solution, SolutionValue solutionValue, const char* filepath, const char* instanceFilepath, float alpha, unsigned int numIterations);
+int saveSolution(Instance* instance, Solution* solution, unsigned int conflicts, SolutionValue solutionValue, const char* filepath, const char* instanceFilepath, float alpha, unsigned int numIterations);
 
 
 
