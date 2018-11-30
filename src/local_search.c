@@ -6,12 +6,14 @@ int bestImprovementLocalSearch(Instance* instance, Solution* solution, SolutionV
     unsigned int neighboursColor[maxDegree];
     unsigned int neighboursColorCount[instance->numColors];
     int local_numConflicts = *numConflicts;
+    const unsigned int NUM_CHANGES = 50;
+    const unsigned int NUM_NEUTRAL_CHANGES = NUM_CHANGES - 1;
 
-//    printf("before local factible: %d\n", solution->isFactible);
-    
     int haveImproved;
     do
     {
+	unsigned int numChangesFound = 0;
+	unsigned int numNeutralChangesFound = 0;
 	haveImproved = 0;
 
 	unsigned int i, j, k;
@@ -20,6 +22,8 @@ int bestImprovementLocalSearch(Instance* instance, Solution* solution, SolutionV
 	    unsigned int vertexColor = solution->coloration[i];
 	    unsigned int numNeighbours;
 	    unsigned int numVertexConflicts;
+	    unsigned int neutralColor;
+	    int neutralColorWasChosen = 0;
 
 	    getVertexNeighboursInfo(instance, solution, i, neighbours, neighboursColor, neighboursColorCount, &numVertexConflicts, &numNeighbours);
 	    	    
@@ -38,8 +42,6 @@ int bestImprovementLocalSearch(Instance* instance, Solution* solution, SolutionV
 		    {
 			if (numNeighbourConflicts == 0)
 			{
-
-
 			    int isHeaviestColor = 1;
 			    for (k = 0; k < instance->numColors; k++)
 			    {
@@ -63,8 +65,11 @@ int bestImprovementLocalSearch(Instance* instance, Solution* solution, SolutionV
 				solutionValue->colorValues[vertexColor] = outColorValue;
 				solutionValue->colorValues[j] = inColorValue;
 				solutionValue->bestValue = inColorValue;
-
+				solution->numVertexPerColor[j]++;
+				solution->numVertexPerColor[vertexColor]--;
+			    
 				haveImproved = 1;
+				numChangesFound++;
 				break;
 			    }
 			}
@@ -78,15 +83,41 @@ int bestImprovementLocalSearch(Instance* instance, Solution* solution, SolutionV
 
 			    solutionValue->colorValues[vertexColor] = outColorValue;
 			    solutionValue->colorValues[j] = inColorValue;
+			    solution->numVertexPerColor[j]++;
+			    solution->numVertexPerColor[vertexColor]--;
 			    
 			    haveImproved = 1;
+			    numChangesFound++;
 			    break;
-			}	
+			}
+			else if (numChangesFound < NUM_NEUTRAL_CHANGES && numNeighbourConflicts == numVertexConflicts && solution->numVertexPerColor[j] > solution->numVertexPerColor[vertexColor])
+			{
+//			    printf("vertex: %d %d -> %d\n", i, vertexColor, j);
+			    
+			    local_numConflicts -= numVertexConflicts;
+			    local_numConflicts += numNeighbourConflicts;
+
+			    solutionValue->colorValues[vertexColor] = outColorValue;
+			    solutionValue->colorValues[j] = inColorValue;
+			    solution->numVertexPerColor[j]++;
+			    solution->numVertexPerColor[vertexColor]--;
+			    
+			    numChangesFound++;
+			    numNeutralChangesFound++;
+
+			    if (numNeutralChangesFound - numChangesFound > 0)
+			    {
+				haveImproved = 1;
+			    }
+			    
+			    break;	
+
+			}
 		    }
 		
 		}
 
-		if (haveImproved)
+		if (haveImproved && numChangesFound >= NUM_CHANGES)
 		{
 		    break;
 		}
@@ -96,12 +127,13 @@ int bestImprovementLocalSearch(Instance* instance, Solution* solution, SolutionV
 		}
 	    }
 		
-	    if (haveImproved)
+	    if (haveImproved && numChangesFound >= NUM_CHANGES)
 	    {
 		break;
 	    }
-	    
 	}
+
+//	printf("numchangesfound: %d, numneutralchangesfound: %d\n", numChangesFound, numNeutralChangesFound);
 
 	if (local_numConflicts == 0)
 	{
@@ -113,46 +145,6 @@ int bestImprovementLocalSearch(Instance* instance, Solution* solution, SolutionV
     
 
     *numConflicts = local_numConflicts;
-    
-    return 0;
-}
-
-int findNeighbours(Instance* instance, Solution* solution, Neighbour** neighbours, unsigned int* numNeighbours)
-{
-    unsigned int local_numNeighbours = 0;
-   
-    unsigned int i, j;
-    for (i = 0; i < instance->numColors; i++)
-    {
-	for (j = 0; j < instance->numColors; j++)
-	{
-	    if (i != j)
-	    {	
-		local_numNeighbours += solution->numVertexPerColor[j];	    
-	    }
-	}
-    }
-    
-    Neighbour* local_neighbours = malloc(sizeof(Neighbour) * local_numNeighbours);
-    if (local_neighbours == NULL) { return -1; }
-
-    unsigned int neighboursCount = 0;
-    for (i = 0; i < instance->numColors; i++)
-    {
-	for (j = 0; j < instance->numVertices; j++)
-	{
-	    if (solution->coloration[j] != i)
-	    {
-		local_neighbours[neighboursCount].inColor = i;
-		local_neighbours[neighboursCount].outColor = solution->coloration[j];
-		local_neighbours[neighboursCount].vertex = j;
-		neighboursCount++;
-	    }
-	}
-    }
-
-    *neighbours = local_neighbours;
-    *numNeighbours = local_numNeighbours;
     
     return 0;
 }

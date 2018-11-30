@@ -1,6 +1,6 @@
 #include "../include/greedy.h"
 
-int greedySolutionFinder(Instance* instance, Solution** solution, SolutionValue* solutionValue, float alpha)
+int greedySolutionFinder(Instance* instance, Solution** solution, SolutionValue* solutionValue, uint* sortedVertices, float alpha)
 {
     if (*solution == NULL)
     {
@@ -30,7 +30,7 @@ int greedySolutionFinder(Instance* instance, Solution** solution, SolutionValue*
     {
 	uint vertex, color, conflict;
 
-	greedyChooseVertex(instance, *solution, chosenVertices, numChosenVertices, &vertex, &color, &conflict, alpha);
+	greedyChooseVertex(instance, *solution, sortedVertices, chosenVertices, numChosenVertices, &vertex, &color, &conflict, alpha);
 
 	(*solution)->coloration[vertex] = color;
 	(*solution)->isFactible *= !conflict;
@@ -58,7 +58,7 @@ int greedySolutionFinder(Instance* instance, Solution** solution, SolutionValue*
 }
 
 
-void greedyChooseVertex(Instance* instance, Solution* solution, uint* chosenVertices, uint numChosenVertices, uint* vertex, uint* color, uint* conflict, float alpha)
+void greedyChooseVertex(Instance* instance, Solution* solution, uint* sortedVertices, uint* chosenVertices, uint numChosenVertices, uint* vertex, uint* color, uint* conflict, float alpha)
 {
     uint rclSize = (1 - alpha) * (instance->numVertices - numChosenVertices);
     if (rclSize == 0)
@@ -70,7 +70,7 @@ void greedyChooseVertex(Instance* instance, Solution* solution, uint* chosenVert
     uint rclColor[rclSize];
     uint rclConflicts[rclSize];
 
-    constructRcl(instance, solution, chosenVertices, rclVertex, rclColor, rclConflicts, rclSize);
+    constructRcl(instance, solution, sortedVertices, chosenVertices, rclVertex, rclColor, rclConflicts, rclSize);
      
     int randomIndex = rand() % rclSize;
 
@@ -79,19 +79,21 @@ void greedyChooseVertex(Instance* instance, Solution* solution, uint* chosenVert
     *conflict = rclConflicts[randomIndex];
  }
 
-void constructRcl(Instance* instance, Solution* solution, uint* chosenVertices, uint* rclVertex, uint* rclColor, uint* rclConflict,  uint rclSize)
+void constructRcl(Instance* instance, Solution* solution, uint* sortedVertices, uint* chosenVertices, uint* rclVertex, uint* rclColor, uint* rclConflict,  uint rclSize)
 {
     uint rclCounter = 0;
     
     uint i, j, k;
     for (i = 0; i < instance->numVertices; i++)
     {
-	if (chosenVertices[i] != 1)
+	uint currentVertex = sortedVertices[i];
+	
+	if (chosenVertices[currentVertex] != 1)
 	{
 	    uint numNeighbours;
 	    uint* neighboursColor = NULL;
 	    uint* neighbours = NULL;
-	    getVertexNeighbours(instance, solution, i, &neighbours, &neighboursColor, &numNeighbours);
+	    getVertexNeighbours(instance, solution, currentVertex, &neighbours, &neighboursColor, &numNeighbours);
 
 	    int colorChosen = 0;
 	    for (j = 0; j < instance->numColors; j++)
@@ -108,7 +110,7 @@ void constructRcl(Instance* instance, Solution* solution, uint* chosenVertices, 
 
 		if (!colorConflict)
 		{
-		    rclVertex[rclCounter] = i;
+		    rclVertex[rclCounter] = currentVertex;
 		    rclColor[rclCounter] = j;
 		    rclConflict[rclCounter] = 0;
 
@@ -123,10 +125,24 @@ void constructRcl(Instance* instance, Solution* solution, uint* chosenVertices, 
 
 	    if (!colorChosen)
 	    {
-		rclVertex[rclCounter] = i;
-		rclColor[rclCounter] = 0;
+		rclVertex[rclCounter] = currentVertex;
 		rclConflict[rclCounter] = 1;
-		    
+
+		unsigned int leastUsedColor = 0;
+		unsigned int leastUsedColorTimes = solution->numVertexPerColor[0];
+		for (j = 1; j < instance->numColors; j++)
+		{
+		    if (solution->numVertexPerColor[j] < leastUsedColorTimes)
+		    {
+			leastUsedColor = j;
+			leastUsedColorTimes = solution->numVertexPerColor[j];
+			
+		    }
+		}
+		
+		rclColor[rclCounter] = leastUsedColor;
+
+
 		rclCounter++;
 
 		if (rclCounter >= rclSize) { free(neighbours); free(neighboursColor); return; }

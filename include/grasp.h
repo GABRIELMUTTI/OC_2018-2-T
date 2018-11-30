@@ -6,6 +6,7 @@
 #include "../include/greedy.h"
 #include "../include/local_search.h"
 
+#include <time.h>
 #include <stddef.h>
 #include <math.h>
 #include <stdio.h>
@@ -14,6 +15,7 @@
 typedef unsigned int uint;
 
 int grasp(Instance* instance, Solution** solution, SolutionValue* value, uint numIterations, float alpha);
+int sortVerticesByDegree(Instance* instance, unsigned int** sortedVertices);
 
 
 #endif // __GRASP_H__

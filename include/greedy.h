@@ -19,9 +19,9 @@ typedef struct vertexWeight_s
 } VertexWeight;
 
 
-int greedySolutionFinder(Instance* instance, Solution** solution, SolutionValue* solutionValue, float alpha);
-void greedyChooseVertex(Instance* instance, Solution* solution, uint* chosenVertices, uint numChosenVertices, uint* vertex, uint* color, uint* conflict, float alpha);
-void constructRcl(Instance* instance, Solution* solution, uint* chosenVertices, uint* rclVertex, uint* rclColor, uint* rclConflict, uint rclSize);
+int greedySolutionFinder(Instance* instance, Solution** solution, SolutionValue* solutionValue, uint* sortedVertices, float alpha);
+void greedyChooseVertex(Instance* instance, Solution* solution, uint* sortedVertices, uint* chosenVertices, uint numChosenVertices, uint* vertex, uint* color, uint* conflict, float alpha);
+void constructRcl(Instance* instance, Solution* solution, uint* sortedVertices, uint* chosenVertices, uint* rclVertex, uint* rclColor, uint* rclConflict, uint rclSize);
 
 
 
