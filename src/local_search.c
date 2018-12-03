@@ -6,7 +6,7 @@ int bestImprovementLocalSearch(Instance* instance, Solution* solution, SolutionV
     unsigned int neighboursColor[maxDegree];
     unsigned int neighboursColorCount[instance->numColors];
     int local_numConflicts = *numConflicts;
-    const unsigned int NUM_CHANGES = 50;
+    const unsigned int NUM_CHANGES = 2;
     const unsigned int NUM_NEUTRAL_CHANGES = NUM_CHANGES - 1;
 
     int haveImproved;
@@ -22,8 +22,6 @@ int bestImprovementLocalSearch(Instance* instance, Solution* solution, SolutionV
 	    unsigned int vertexColor = solution->coloration[i];
 	    unsigned int numNeighbours;
 	    unsigned int numVertexConflicts;
-	    unsigned int neutralColor;
-	    int neutralColorWasChosen = 0;
 
 	    getVertexNeighboursInfo(instance, solution, i, neighbours, neighboursColor, neighboursColorCount, &numVertexConflicts, &numNeighbours);
 	    	    

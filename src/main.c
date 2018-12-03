@@ -56,6 +56,8 @@ int main(int argc, char* argv[])
     printf("Done!\n");
     printf("Saving...\n");
 
+    printf("Final Checkage: %f <%d, %d>\n", value.bestValue, solution->isFactible, countSolutionConflicts(instance, solution));
+    
     unsigned int conflicts = countSolutionConflicts(instance, solution);
     
     saveSolution(instance, solution, conflicts, value, saveFilepath, instanceFilepath, alpha, numIterations);

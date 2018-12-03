@@ -14,6 +14,15 @@ int newSolution(Solution** solution, Instance* instance)
     return OUT_SUCCESS;
 }
 
+int newSolutionValue(SolutionValue* value, Instance* instance)
+{
+
+    value->colorValues = malloc(sizeof(float) * instance->numColors);
+
+
+    return 0;
+}
+
 void destroySolution(Solution* solution)
 {
     free(solution->coloration);
@@ -188,4 +197,31 @@ void printSolution(Instance* instance, Solution* solution)
 	printf("\tv %d -> c %d\n", i, solution->coloration[i]);	    
     }
     
+}
+
+int copySolution(Instance* instance, Solution* solution, SolutionValue value, Solution** destSolution, SolutionValue* destValue)
+{
+    if (*destSolution == NULL)
+    {
+	newSolution(destSolution, instance);
+    }
+
+    if (destValue->colorValues == NULL)
+    {
+	destValue->colorValues = malloc(sizeof(float) * instance->numColors);
+    }
+    
+    
+    memcpy((*destSolution)->coloration, solution->coloration, sizeof(uint) * instance->numVertices);
+    memcpy((*destSolution)->numVertexPerColor, solution->numVertexPerColor, sizeof(uint) * instance->numColors);
+    (*destSolution)->isFactible = solution->isFactible;
+    (*destSolution)->numConflicts = solution->numConflicts;
+
+    memcpy(destValue->colorValues, value.colorValues, sizeof(float) * instance->numColors);
+    destValue->bestValue = value.bestValue;
+
+    
+    
+    
+    return 0;
 }
