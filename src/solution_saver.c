@@ -5,27 +5,15 @@ int saveSolution(Instance* instance, Solution* solution, unsigned int conflicts,
     time_t currentTime;
     time(&currentTime);
 
-    char* factibleFolderStr = "factible/";
     
     const char* filename = ctime(&currentTime);
 
-    char fullFilepath[strlen(filename) + strlen(filepath) + strlen(factibleFolderStr)];
+    char fullFilepath[strlen(filename) + strlen(filepath)];
     memcpy(fullFilepath, filepath, strlen(filepath));
     
     
-    if (solution->isFactible)
-    {
-	memcpy(fullFilepath + strlen(filepath), factibleFolderStr, strlen(factibleFolderStr));
-	memcpy(fullFilepath + strlen(filepath) + strlen(factibleFolderStr), filename, strlen(filename) - 1);
-	fullFilepath[strlen(filepath) + strlen(filename) + strlen(factibleFolderStr) - 1] = '\0';
-
-	printf("fullpath: %s\n", fullFilepath);
-    }
-    else
-    {
-	memcpy(fullFilepath + strlen(filepath), filename, strlen(filename) - 1);
-	fullFilepath[strlen(filepath) + strlen(filename) - 1] = '\0';
-    }
+    memcpy(fullFilepath + strlen(filepath), filename, strlen(filename) - 1);
+    fullFilepath[strlen(filepath) + strlen(filename) - 1] = '\0';
     
     FILE* file = fopen(fullFilepath, "w");
 

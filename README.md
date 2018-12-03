@@ -20,3 +20,11 @@ lista de pesos correspondentes a cada vértice e um inteiro positivo k.
 | cmb08          | 636637.88 |
 | cmb09          | 221418.46 |
 | cmb10          | 123671.76 |
+
+# Como executar:
+  - Compile o código com o comando "make all";
+  - Execute com, por exemplo, "make run ARGS=""1000 0.85 /home/gabriel/Documents/ufrgs/courses/oc/trab/instances/cmb02 /home/gabriel/Documents/ufrgs/courses/oc/trab/my_solutions/"" onde:
+   - o primeiro número é o número de iterações;
+   - o segundo é o valor do alpha;
+   - o terceiro é o filepath da instância.
+   - o quarto é onde os resultados serão salvos.

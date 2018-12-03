@@ -7,7 +7,6 @@
 #include "../include/local_search.h"
 #include "../include/path_relinking.h"
 
-#include <time.h>
 #include <stddef.h>
 #include <math.h>
 #include <stdio.h>

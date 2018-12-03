@@ -2,12 +2,6 @@
 
 int grasp(Instance* instance, Solution** solution, SolutionValue* value, unsigned int numIterations, float alpha)
 {
-    clock_t start, end;
-    double cpuTimeUsed;
-
-    start = clock();
-
-    
     if (*solution == NULL)
     {
 	if (newSolution(solution, instance) != 0) { return -1; }
@@ -71,27 +65,21 @@ int grasp(Instance* instance, Solution** solution, SolutionValue* value, unsigne
     }
     
     if (greedySolutionFinder(instance, &bestSolution, &bestSolutionValue, sortedVertices, alpha) != 0) { return -1; }
-    printf("Starting solution: %f <%d>\n", bestSolutionValue.bestValue, bestSolution->isFactible);
+    printf("Starting solution: %f\n", bestSolutionValue.bestValue);
     float initialSolutionValue = bestSolutionValue.bestValue;
     unsigned int initialNumConflicts = countSolutionConflicts(instance, bestSolution);
    
     bestNumConflicts = countSolutionConflicts(instance, bestSolution);
-    printf("Num Conflicts: %d\n", bestNumConflicts);
+    printf("Starting Conflicts: %d\n", bestNumConflicts);
     unsigned int iterationCounter = 0;
     do
     {
-	//printf("Iteration %d\n", iterationCounter);
 	greedySolutionFinder(instance, &currentSolution, &currentSolutionValue, sortedVertices, alpha);
 	unsigned int numConflicts = countSolutionConflicts(instance, currentSolution);
-//	printf("Num Conflicts after greedy: %d\n", numConflicts);
-//	printf(RED "After Greedy Value: %f <%d, %d>" RESET "\n", currentSolutionValue.bestValue, currentSolution->isFactible, countSolutionConflicts(instance, currentSolution));
-	
+
 	bestImprovementLocalSearch(instance, currentSolution, &currentSolutionValue, &numConflicts, maxDegree);
-//	printf(GRN "After Local Value: %f <%d, %d>\n" RESET, currentSolutionValue.bestValue, currentSolution->isFactible, numConflicts);
-	      
-	// path relinking
+
 	pathRelinking(instance, eliteSolutions, eliteValues, numElites, currentSolution, &currentSolutionValue, &numConflicts);
-//	printf(MAG "After Path Relinking Value: %f <%d, %d>" RESET "\n", currentSolutionValue.bestValue, currentSolution->isFactible, countSolutionConflicts(instance, currentSolution));
 	currentSolution->numConflicts = numConflicts;
 	
 	if ((!bestSolution->isFactible) || currentSolution->isFactible)
@@ -102,7 +90,7 @@ int grasp(Instance* instance, Solution** solution, SolutionValue* value, unsigne
 		bestNumConflicts = numConflicts;
 	
 		
-		printf("Found better: %f <%d>, numConflicts: %d" RESET "\n", bestSolutionValue.bestValue, bestSolution->isFactible, bestNumConflicts);
+		printf("Found better: %f, NumConflicts: %d" RESET "\n", bestSolutionValue.bestValue, bestNumConflicts);
 	    }
 
 	    if (numElites < NUM_ELITES)
@@ -124,7 +112,6 @@ int grasp(Instance* instance, Solution** solution, SolutionValue* value, unsigne
 		    }
 		}
 
-//		printf("currentsol %d, biggest %d\n", currentSolution->numConflicts, biggestConflicts);
 		if (currentSolution->numConflicts < biggestConflicts)
 		{
 		    copySolution(instance, currentSolution, currentSolutionValue, &eliteSolutions[eliteIndex], &eliteValues[eliteIndex]);
@@ -163,19 +150,11 @@ int grasp(Instance* instance, Solution** solution, SolutionValue* value, unsigne
 	
 	iterationCounter++;
 
-	end = clock();
-	cpuTimeUsed = (end - start) / CLOCKS_PER_SEC;
-
-	if (cpuTimeUsed >= 1800)
-	{
-	    break;
-	}
-	
     } while(iterationCounter < numIterations);
     
     copySolution(instance, bestSolution, bestSolutionValue, solution, value);
-    printf("Final solution value: %f <%d %d>\n", value->bestValue, (*solution)->isFactible, bestSolution->isFactible);
-    printf("Initial solution value: %f, numConflicts: %d\n", initialSolutionValue, initialNumConflicts);
+    printf("Final solution value: %f\n", value->bestValue);
+    printf("Initial solution value: %f, NumConflicts: %d\n", initialSolutionValue, initialNumConflicts);
 
     free(bestSolutionValue.colorValues);
     free(currentSolutionValue.colorValues);
