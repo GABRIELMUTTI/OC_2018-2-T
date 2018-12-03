@@ -1,0 +1,14 @@
+Instance: /home/gabriel/Documents/ufrgs/courses/oc/trab/instances/tst_cmb02
+Vertices: 5
+Colors: 3
+NumIterations: 1
+Alpha: 1.000000
+Is Factible?: false
+Conflicts: 1
+Solution Value: 6699.969727
+Vertex,	Color
+0,	0
+1,	2
+2,	0
+3,	1
+4,	0

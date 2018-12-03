@@ -1,0 +1,20 @@
+COMPILER := gcc
+COMPILER_FLAGS := -Wall -fdiagnostics-color
+LINKER_FLAGS :=
+
+SRC := src
+BIN := bin
+EXECUTABLE := main
+INCLUDES := include
+INCLUDE := -Iinclude/ -Iinclude/test
+
+all: $(BIN)/$(EXECUTABLE)
+
+clean:
+	rm bin/*
+
+run:
+	./$(BIN)/$(EXECUTABLE) ${ARGS} /home/gabriel/Documents/ufrgs/courses/oc/trab/instances/cmb02 /home/gabriel/Documents/ufrgs/courses/oc/trab/final_solutions/
+
+$(BIN)/$(EXECUTABLE): $(SRC)/*.c $(SRC)/*.c $(INCLUDES)/*.h $(INCLUDES)/*.h
+	$(COMPILER) $(COMPILER_FLAGS) $(INCLUDE) $^ -o $@ $(LINKER_FLAGS)
